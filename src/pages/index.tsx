@@ -1,10 +1,11 @@
 import * as React from 'react'
 import { withStyle, useStyletron } from 'baseui'
 import { StyledTable, StyledHeadCell, StyledBodyCell } from 'baseui/table-grid'
-import Skeleton from 'react-loading-skeleton'
+import { Tag } from 'baseui/tag'
 import { Button } from 'baseui/button'
+
 import nanoid from 'nanoid'
-import { PlusCircle, Plus, Delete, X } from 'react-feather'
+import { PlusCircle, Plus, X, RotateCcw, Search } from 'react-feather'
 import {
   Modal,
   ModalFooter,
@@ -12,7 +13,7 @@ import {
   ModalHeader,
   ModalBody,
 } from 'baseui/modal'
-import { FieldArray, useFormik, Form, Formik } from 'formik'
+import { FieldArray, Form, Formik } from 'formik'
 import { Block } from 'baseui/block'
 import { Label2, Paragraph2 } from 'baseui/typography'
 import { Input } from 'baseui/input'
@@ -22,10 +23,11 @@ import { db } from '../hooks/use-auth'
 import { useAuth } from '../hooks/use-auth'
 import { useHistory } from 'react-router-dom'
 import { StyledSpinnerNext } from 'baseui/spinner'
-import { fbase } from "../hooks/use-auth"
-import axios from 'axios'
-//import { stat } from 'fs'
+// import axios from 'axios'
+// import { el } from 'date-fns/locale'
+import { Radio, RadioGroup } from 'baseui/radio'
 
+//import { stat } from 'fs'
 
 const CenteredBodyCell = withStyle(StyledBodyCell, ({ $theme }) => ({
   display: 'flex',
@@ -43,8 +45,8 @@ const CenteredBodyCellLeft = withStyle(StyledBodyCell, {
 
 const HeadCellLeft = withStyle(StyledHeadCell, ({ $theme }) => ({
   boxShadow: 'none',
-  borderWidth: '0px',
   backgroundColor: $theme.colors.positive,
+  borderWidth: '0px',
   color: $theme.colors.mono100,
 }))
 
@@ -60,7 +62,7 @@ const NewStyledTable = withStyle(StyledTable, ({ $theme }) => ({
   boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
 }))
 
-const Row = ({ striped, row }: any) => {
+const Row = ({ striped, row, type }: any) => {
   const [css, theme] = useStyletron()
   const router = useHistory()
   return (
@@ -114,23 +116,46 @@ const Row = ({ striped, row }: any) => {
             whiteSpace: 'nowrap',
           })}
         >
-          {row.date}
+          {row.actived === 'yes' ? (
+            <Tag closeable={false} variant="outlined" kind={'positive'}>
+              {'Actived yet'}
+            </Tag>
+          ) : (
+            <Tag closeable={false} variant="outlined" kind={'warning'}>
+              {'Not actived'}
+            </Tag>
+          )}
         </div>
       </CenteredBodyCellLeft>
       <CenteredBodyCellLeft $striped={striped}>
-        <Button
-          size="compact"
-          kind="tertiary"
-          onClick={() => router.push(`/devices/${row.deviceID}`)}
-        >
-          Xem
-        </Button>
+        {row.actived === 'yes' ? (
+          <Button
+            size="compact"
+            kind="tertiary"
+            onClick={() => {
+              router.push(`/devices/${type}/${row.deviceID}`)
+            }}
+          >
+            Xem
+          </Button>
+        ) : (
+          <Button
+            size="compact"
+            kind="tertiary"
+            onClick={() => {
+              router.push(`/devices/${type}/${row.deviceID}`)
+            }}
+            disabled
+          >
+            Xem
+          </Button>
+        )}
       </CenteredBodyCellLeft>
     </>
   )
 }
 
-export const DevicesTable = ({ devices }: any) => {
+export const DevicesTable = ({ devices, type }: any) => {
   const [css, theme] = useStyletron()
 
   return (
@@ -144,12 +169,12 @@ export const DevicesTable = ({ devices }: any) => {
         <HeadCellLeft $sticky={false}>ID</HeadCellLeft>
         <HeadCellLeft $sticky={false}>Tên thiết bị</HeadCellLeft>
         <HeadCellLeft $sticky={false}>Miêu tả</HeadCellLeft>
-        <HeadCellLeft $sticky={false}>Cập nhật</HeadCellLeft>
+        <HeadCellLeft $sticky={false}>Trạng thái</HeadCellLeft>
         <HeadCellLeft $sticky={false}>Hành động</HeadCellLeft>
 
         {devices!.map((row: any, index: any) => {
           const striped = (index + 1) % 2 === 0
-          return <Row key={index} row={row} striped={striped} />
+          return <Row key={index} row={row} striped={striped} type={type} />
         })}
       </NewStyledTable>
     </div>
@@ -157,93 +182,142 @@ export const DevicesTable = ({ devices }: any) => {
 }
 
 const IndexPage = () => {
-
-
   const [css, theme] = useStyletron()
-  // const [allDevices, setAllDevices] = React.useState({ mydevice: "loading", linkeddevice: "loading" })
   const [devices, setDevices] = React.useState('loading')
 
-  const [linkedDevices, setLinkedDevices] = React.useState('loading');
+  const [linkedDevices, setLinkedDevices] = React.useState('loading')
   const router = useHistory()
   const [isOpen, setIsOpen] = React.useState(false)
   const { state }: any = useAuth()
-  //console.log(state.user.uid)
   const [isload, setload] = React.useState(false)
-  React.useEffect(() => {
-    console.log("goi useffect")
-    let unsubscribe: any = db.collection('ownDevice').where('auth', '==', state.user.uid).onSnapshot((snapshot: any) => {
-      let arrdevice: any = [];
-      snapshot.forEach(async (doc: any) => {
-        const data = doc.data().device.get()
-        arrdevice.push(data)
+  const inputRef = React.useRef<HTMLInputElement>(null)
+  const [value, setValue] = React.useState('deviceID')
+
+  const testfun = async () => {
+    db.collection('device')
+      .add({
+        actived: 'no',
+        auth: state.user.uid,
+        name: 'name ne',
+        desc: 'mieu ta ne',
+        refUser: [],
       })
-      if (arrdevice.length > 0) {
-        Promise.all(arrdevice).then((res: any) => {
+      .catch((err) => {
+        console.log(err)
+      })
+  }
 
-          let arr: any = []
-
-          res.forEach((device: any) => {
-            arr.push(device.data())
+  const searchbutton = async () => {
+    const result: any = []
+    if (inputRef.current?.value !== '') {
+      console.log(inputRef.current?.value)
+      const searchinput = inputRef.current?.value
+      const fieldcompare = value
+      console.log(fieldcompare)
+      if (fieldcompare === 'deviceID') {
+        await db
+          .collection('device')
+          .doc(searchinput)
+          .get()
+          .then((doc: any) => {
+            if (doc.exists) {
+              let data = doc.data()
+              data.deviceID = doc.id
+              result.push(data)
+              setDevices(result)
+            } else {
+              setDevices(result)
+            }
           })
-          setDevices(arr);
-        })
+          .catch((err) => {
+            console.log(err)
+            setDevices(result)
+          })
       } else {
-        let arr: any = [];
-        setDevices(arr);
+        console.log('do day')
+        await db
+          .collection('device')
+          .where('auth', '==', state.user.uid)
+          .where(fieldcompare, '==', searchinput)
+          .get()
+          .then((snapshot: any) => {
+            snapshot.forEach(async (doc: any) => {
+              const data = doc.data()
+              data.deviceID = doc.id
+              result.push(data)
+            })
+            setDevices(result)
+          })
+          .catch((err) => {
+            console.log(err)
+            setDevices(result)
+          })
       }
-    })
-    // const [devices, setDevices] = React.useState('loading')
-    // console.log(mydevicedata)
-    console.log("set device")
-    // setDevices(mydevicedata);
-    console.log("after set device:" + devices)
-    console.log("render lai");
+    } else {
+      console.log('rong')
+      return inputRef.current && inputRef.current.focus()
+    }
+  }
+
+  const reloadbutton = () => {
+    let arrdevice: any = []
+    db.collection('device')
+      .where('auth', '==', state.user.uid)
+      .get()
+      .then((snapshot: any) => {
+        snapshot.forEach(async (doc: any) => {
+          const data = doc.data()
+          data.deviceID = doc.id
+          // console.log(data)
+          arrdevice.push(data)
+        })
+
+        setDevices(arrdevice)
+      })
+      .catch(function (error) {
+        console.log('Error getting documents: ', error)
+      })
+  }
+
+  React.useEffect(() => {
+    console.log('goi useffect')
+    let unsubscribe: any = db
+      .collection('device')
+      .where('auth', '==', state.user.uid)
+      .onSnapshot((snapshot: any) => {
+        let arrdevice: any = []
+        snapshot.forEach(async (doc: any) => {
+          const data = doc.data()
+          // // console.log(data)
+          data.deviceID = doc.id
+          arrdevice.push(data)
+        })
+        setDevices(arrdevice)
+      })
     return () => unsubscribe()
   }, [])
 
   React.useEffect(() => {
-    console.log("goi useffect")
-    let unsubscribe: any = db.collection('refDevices').where('auth', '==', state.user.uid).onSnapshot((snapshot: any) => {
-      let arrdevice: any = [];
-      snapshot.forEach(async (doc: any) => {
-        // const data = await doc.data();
-        const data = doc.data().device.get()
-        // console.log(data)
-        arrdevice.push(data)
-      })
-      if (arrdevice.length > 0) {
-        Promise.all(arrdevice).then((res: any) => {
-
-          let arr: any = []
-          for (let device of res) {
-            // console.log(res[device].data())
-            const dev = device.data();
-            arr.push(dev)
-          }
-
-          setLinkedDevices(arr);
+    console.log('goi useffect')
+    let unsubscribe: any = db
+      .collection('device')
+      .where('refUser', 'array-contains', state.user.uid)
+      .onSnapshot((snapshot: any) => {
+        let arrdevice: any = []
+        snapshot.forEach(async (doc: any) => {
+          const data = doc.data()
+          data.deviceID = doc.id
+          arrdevice.push(data)
         })
-      } else {
-        let arr: any = [];
-        setLinkedDevices(arr);
-      }
-    })
-    // const [devices, setDevices] = React.useState('loading')
-    console.log("set device")
-    // setDevices(mydevicedata);
-    console.log("after set device:" + devices)
-    console.log("render lai");
+        setLinkedDevices(arrdevice)
+      })
     return () => unsubscribe()
   }, [])
 
-
-  console.log("day la mydevice : ", devices);
-  // console.log("day la linked device: ", linkedDevices)
-  console.log("render ne")
   return (
     <div
       className={css({
-        maxWidth: '999px',
+        maxWidth: '1200px',
         padding: theme.sizing.scale400,
         margin: `${theme.sizing.scale600} auto`,
       })}
@@ -253,10 +327,16 @@ const IndexPage = () => {
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
+          marginBottom: theme.sizing.scale600,
         })}
       >
-        <div className={css({ ...theme.typography.font550 })}>
-          Danh sách thiết bị
+        <div
+          className={css({
+            ...theme.typography.font650,
+            marginBottom: theme.sizing.scale600,
+          })}
+        >
+          DANH SÁCH THIẾT BỊ ĐANG SỞ HỬU
         </div>
         <Button
           onClick={() => setIsOpen(true)}
@@ -268,12 +348,77 @@ const IndexPage = () => {
             BaseButton: {
               style: {
                 borderTopLeftRadius: theme.sizing.scale400,
-                borderBottomRightRadius: theme.sizing.scale400,
+                borderBottomRightRadius: theme.sizing.scale600,
               },
             },
           }}
         >
           Thêm thiết bị
+        </Button>
+      </div>
+
+      <div
+        className={css({
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: theme.sizing.scale600,
+        })}
+      >
+        <Input
+          inputRef={inputRef}
+          placeholder="Nhập ID hoặc tên để tìm kiếm thiết bi"
+          overrides={{
+            Root: {
+              style: {
+                width: '30%',
+                marginRight: theme.sizing.scale600,
+              },
+            },
+          }}
+        />
+        <RadioGroup
+          align="horizontal"
+          name="horizontal"
+          onChange={(e) => setValue(e.target.value)}
+          value={value}
+        >
+          <Radio value="deviceID">ID thiết bị</Radio>
+          <Radio value="name">Tên thiết bị</Radio>
+        </RadioGroup>
+        <Button
+          kind={'secondary'}
+          overrides={{
+            BaseButton: {
+              style: {
+                borderTopLeftRadius: theme.sizing.scale400,
+                borderBottomRightRadius: theme.sizing.scale400,
+              },
+            },
+          }}
+          startEnhancer={() => (
+            <Search color={theme.colors.mono700} size={18} />
+          )}
+          onClick={searchbutton}
+        >
+          Tim kiếm
+        </Button>
+        <Button
+          kind={'secondary'}
+          overrides={{
+            BaseButton: {
+              style: {
+                borderTopLeftRadius: theme.sizing.scale400,
+                borderBottomRightRadius: theme.sizing.scale400,
+              },
+            },
+          }}
+          startEnhancer={() => (
+            <RotateCcw color={theme.colors.mono700} size={18} />
+          )}
+          onClick={reloadbutton}
+        >
+          Tải lại
         </Button>
       </div>
 
@@ -289,8 +434,6 @@ const IndexPage = () => {
           <StyledSpinnerNext />
         </div>
       )}
-
-
 
       {devices !== 'loading' && devices.length === 0 && (
         <div
@@ -308,13 +451,17 @@ const IndexPage = () => {
       )}
 
       {devices !== 'loading' && devices.length > 0 && (
-        <DevicesTable devices={devices} />
+        <DevicesTable devices={devices} type={'own'} />
       )}
 
-
-      <div className={css({ ...theme.typography.font550 })}>
-        Danh sách thiết bị linked
-        </div>
+      <div
+        className={css({
+          ...theme.typography.font650,
+          marginBottom: theme.sizing.scale600,
+        })}
+      >
+        DANH SÁCH THIẾT BỊ ĐƯỢC CHIA SẼ
+      </div>
       {linkedDevices !== 'loading' && linkedDevices.length === 0 && (
         <div
           className={css({
@@ -331,7 +478,7 @@ const IndexPage = () => {
       )}
 
       {linkedDevices !== 'loading' && linkedDevices.length > 0 && (
-        <DevicesTable devices={linkedDevices} />
+        <DevicesTable devices={linkedDevices} type={'link'} />
       )}
       {/* add device modal */}
       <Modal
@@ -397,12 +544,13 @@ const IndexPage = () => {
               // router.push(`/devices/${values.devicesID}`)
 
               let deviceItem: any = {
+                actived: 'no',
                 auth: state.user.uid,
                 deiveID: values.deviceID,
-                device: db.doc('devices/' + values.deviceID)
+                device: db.doc('devices/' + values.deviceID),
               }
 
-              console.log(deviceItem)
+              // console.log(deviceItem)
               // myDevices.push(deviceItem);
               await db.collection('ownDevice').add(deviceItem)
 
@@ -468,7 +616,7 @@ const IndexPage = () => {
                     }}
                   />
                 </FormControl>
-                <FormControl label="ID thiết bị *">
+                {/* <FormControl label="ID thiết bị *">
                   <Input
                     required
                     disabled
@@ -485,7 +633,7 @@ const IndexPage = () => {
                       },
                     }}
                   />
-                </FormControl>
+                </FormControl> */}
                 {/* <FormControl
                   label="Khóa riêng tư Sawtooth *"
                   caption="TODO: Help"
@@ -526,7 +674,7 @@ const IndexPage = () => {
 
                 <FieldArray
                   name="data_fields"
-                  render={arrayHelpers => (
+                  render={(arrayHelpers) => (
                     <>
                       <Block display="flex" alignItems="center">
                         <Label2 paddingRight="scale400">Data fields</Label2>
@@ -612,7 +760,7 @@ const IndexPage = () => {
                                     type="text"
                                     onChange={handleChange}
                                     placeholder="°C"
-                                    value={data_field.field_unit || ""}
+                                    value={data_field.field_unit || ''}
                                     overrides={{
                                       InputContainer: {
                                         style: {
@@ -694,11 +842,11 @@ const IndexPage = () => {
                   Thêm
                 </ModalButton>
               </ModalFooter>
-            </Form >
+            </Form>
           )}
         />
-      </Modal >
-    </div >
+      </Modal>
+    </div>
     // <div>hihi</div>
   )
 }

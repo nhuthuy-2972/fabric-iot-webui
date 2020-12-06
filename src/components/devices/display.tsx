@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useStyletron } from 'baseui'
 import { Zap, Activity } from 'react-feather'
-import moment from 'moment';
+// import moment from 'moment';
 
 import {
   ResponsiveContainer,
@@ -11,11 +11,10 @@ import {
   YAxis,
   Tooltip,
   Line,
-  Text
+  Text,
 } from 'recharts'
 
-moment().zone(7)
-
+// moment().zone(7)
 
 // const CustomizedLabel = ({ x, y, stroke, value }: any) => {
 
@@ -24,14 +23,24 @@ moment().zone(7)
 // }
 
 const CustomizedAxisTick = ({ x, y, stroke, payload }: any) => {
-
   return (
     <g transform={`translate(${x},${y})`}>
-      <text x={0} y={0} dx={20} dy={16} textAnchor="end" fill="#000000" fontWeight='bold' fontSize={10} transform="rotate(-20)">{payload.value}</text>
+      <text
+        x={0}
+        y={0}
+        dx={20}
+        dy={16}
+        textAnchor="end"
+        fill="#000000"
+        fontWeight="bold"
+        fontSize={10}
+        transform="rotate(-20)"
+      >
+        {payload.value}
+      </text>
     </g>
-  );
+  )
 }
-
 
 const Display = ({ field, data, history }: any) => {
   const [css, theme] = useStyletron()
@@ -68,7 +77,8 @@ const Display = ({ field, data, history }: any) => {
                 color: theme.colors.mono800,
               })}
             >
-              {moment(new Date(data['timestamp'] * 1000).toLocaleString()).format("[Lúc] hh:mm:ss a [ngày ] DD [tháng ] MM [năm ] YYYY")}
+              {/* {moment(new Date(data['timestamp'] * 1000).toLocaleString()).format("[Lúc] hh:mm:ss a [ngày ] DD [tháng ] MM [năm ] YYYY")} */}
+              {new Date(data['timestamp'] * 1000).toLocaleString()}
             </div>
           </div>
         </div>
@@ -85,7 +95,7 @@ const Display = ({ field, data, history }: any) => {
             textAlign: 'center',
           })}
         >
-          {`${data[field.field_name] || ""} ${field.field_unit || ""}`}
+          {`${data[field.field_name] || ''} ${field.field_unit || ''}`}
         </div>
       </div>
       <div
@@ -112,7 +122,8 @@ const Display = ({ field, data, history }: any) => {
           </div>
           <div>
             <div className={css({ ...theme.typography.font400 })}>
-              {field.field_display} (Trong khoảng 24 giờ kể từ lần cập nhật cuối cùng)
+              {field.field_display} (Trong khoảng 24 giờ kể từ lần cập nhật cuối
+              cùng)
             </div>
           </div>
         </div>
@@ -134,11 +145,12 @@ const Display = ({ field, data, history }: any) => {
               }}
             >
               <CartesianGrid vertical={false} />
-              <XAxis dataKey="time" tickFormatter={value => value} tick={<CustomizedAxisTick />} />
-              <YAxis
-                axisLine={false}
-                tickFormatter={value => value}
+              <XAxis
+                dataKey="time"
+                tickFormatter={(value) => value}
+                tick={<CustomizedAxisTick />}
               />
+              <YAxis axisLine={false} tickFormatter={(value) => value} />
 
               <Tooltip />
               <Line

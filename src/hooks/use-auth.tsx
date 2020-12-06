@@ -123,6 +123,7 @@ function useProvideAuth() {
   }
   const signout = () => {
     //history.push('/')
+    sessionStorage.clear();
     return firebase.auth().signOut()
   }
 
