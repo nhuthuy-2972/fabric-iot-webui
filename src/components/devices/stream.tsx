@@ -2,11 +2,16 @@ import * as React from 'react'
 import { DeepstreamClient } from '@deepstream/client'
 import { useStyletron } from 'baseui'
 // import { Button } from 'baseui/button'
+<<<<<<< HEAD
 // import moment from 'moment'
+=======
+import moment from 'moment'
+>>>>>>> 5f04b8245b814d5c64d6824e5edfcf59de2ab1ad
 import axios from 'axios'
 import { useParams } from 'react-router-dom'
 import { db, useAuth } from '../../hooks/use-auth'
 import Display from './display'
+<<<<<<< HEAD
 // // import { Settings } from 'react-feather';
 // import {
 //   Modal,
@@ -20,6 +25,21 @@ import Display from './display'
 import createAuthRefreshInterceptor from 'axios-auth-refresh'
 
 // moment().zone(7)
+=======
+// import { Settings } from 'react-feather';
+import {
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  ModalButton,
+  FocusOnce,
+} from 'baseui/modal'
+import { Input, SIZE } from 'baseui/input'
+import createAuthRefreshInterceptor from 'axios-auth-refresh'
+
+moment().zone(7)
+>>>>>>> 5f04b8245b814d5c64d6824e5edfcf59de2ab1ad
 
 const StreamDevices = ({ info }: any) => {
   const [css, theme] = useStyletron()
@@ -27,6 +47,11 @@ const StreamDevices = ({ info }: any) => {
   const { typeDevice, id }: any = useParams()
   const [history, sethistory] = React.useState(Object)
   const [fields, setfields] = React.useState(Array)
+<<<<<<< HEAD
+=======
+  const [private_key, setPrivate_key] = React.useState(Array)
+  const [token, setToken] = React.useState(Array)
+>>>>>>> 5f04b8245b814d5c64d6824e5edfcf59de2ab1ad
   const [device, setdevice] = React.useState(Object)
   const [isOpen, setOpen] = React.useState(false)
   const { state }: any = useAuth()
@@ -35,11 +60,23 @@ const StreamDevices = ({ info }: any) => {
     client.login()
     const record = client.record.getRecord('news')
     function getds() {
+<<<<<<< HEAD
       const refreshAuthToken = (failedRequest: any) => {
         axios({
           method: 'post',
           url: 'http://localhost:4002/api/user/gettoken',
           data: {},
+=======
+      const refreshAuthToken = (failedRequest: any) =>
+        axios({
+          method: 'post',
+          url: 'http://localhost:9997/api/auth/gettoken',
+          data: {
+            username: '5FkfDy4apYdpjt2JlyE1VL4jQGg1',
+            orgName: 'Org1',
+            channel: 'channelid1',
+          },
+>>>>>>> 5f04b8245b814d5c64d6824e5edfcf59de2ab1ad
         }).then((tokenRefreshResponse: any) => {
           // localStorage.setItem('token', tokenRefreshResponse.data.token);
           console.log('token respone', tokenRefreshResponse)
@@ -47,7 +84,11 @@ const StreamDevices = ({ info }: any) => {
             'Bearer ' + tokenRefreshResponse.data.token
           return Promise.resolve()
         })
+<<<<<<< HEAD
       }
+=======
+
+>>>>>>> 5f04b8245b814d5c64d6824e5edfcf59de2ab1ad
       record.subscribe(`news/${id}`, async (value: any) => {
         await setData(value)
         console.log('valuene ', value)
@@ -125,13 +166,22 @@ const StreamDevices = ({ info }: any) => {
   React.useEffect(() => {
     console.log('set fields')
     const getdata = async () => {
+<<<<<<< HEAD
       let docs = db.collection('device').doc(id)
+=======
+      let docs = db.collection('devices').doc(id)
+
+>>>>>>> 5f04b8245b814d5c64d6824e5edfcf59de2ab1ad
       await docs
         .get()
         .then(async (doc) => {
           if (!doc.exists) {
             console.log('No such document!')
           } else {
+<<<<<<< HEAD
+=======
+            // console.log('Document data:', doc.get('data_fields'));
+>>>>>>> 5f04b8245b814d5c64d6824e5edfcf59de2ab1ad
             let field = doc.get('data_fields')
             // setPrivate_key(doc.get('privateKey'))
             // setToken(doc.get('token'))
