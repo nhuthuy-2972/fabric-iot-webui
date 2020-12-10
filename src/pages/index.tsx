@@ -23,17 +23,9 @@ import { db, fbase } from '../hooks/use-auth'
 import { useAuth } from '../hooks/use-auth'
 import { useHistory } from 'react-router-dom'
 import { StyledSpinnerNext } from 'baseui/spinner'
-<<<<<<< HEAD
 
-import { Radio, RadioGroup } from 'baseui/radio'
 import axios from 'axios'
-=======
-// import axios from 'axios'
-// import { el } from 'date-fns/locale'
 import { Radio, RadioGroup } from 'baseui/radio'
-
-//import { stat } from 'fs'
->>>>>>> 5f04b8245b814d5c64d6824e5edfcf59de2ab1ad
 
 const CenteredBodyCell = withStyle(StyledBodyCell, ({ $theme }) => ({
   display: 'flex',
@@ -200,7 +192,6 @@ const IndexPage = () => {
   const [value, setValue] = React.useState('deviceID')
 
   const testfun = async () => {
-<<<<<<< HEAD
     // db.collection('device')
     //   .add({
     //     actived: 'no',
@@ -218,7 +209,6 @@ const IndexPage = () => {
     //   .then((doc : any)=>{
     //     if(doc.exit())
     //   })
-=======
     db.collection('device')
       .add({
         actived: 'no',
@@ -230,7 +220,6 @@ const IndexPage = () => {
       .catch((err) => {
         console.log(err)
       })
->>>>>>> 5f04b8245b814d5c64d6824e5edfcf59de2ab1ad
   }
 
   const searchbutton = async () => {
@@ -340,11 +329,6 @@ const IndexPage = () => {
     return () => unsubscribe()
   }, [])
 
-<<<<<<< HEAD
-  // console.log("state : ",state.customClaims.token)
-  // fbase.auth().currentUser?.getIdToken().then(res=>{console.log("get",res)})
-=======
->>>>>>> 5f04b8245b814d5c64d6824e5edfcf59de2ab1ad
   return (
     <div
       className={css({
@@ -545,7 +529,6 @@ const IndexPage = () => {
           onSubmit={async (values, actions) => {
             actions.setSubmitting(true)
             try {
-<<<<<<< HEAD
                            
               const result = await axios({
                 method : "post",
@@ -560,48 +543,6 @@ const IndexPage = () => {
                 }
               })
               console.log("ket qua them may: ",result.data)
-=======
-              // let res_create_key = await axios({
-              //   method: "post",
-              //   url: "http://localhost:8888/device/create_key",
-              //   data: {
-              //     device_id: values.devicesId
-              //   }
-              // });
-              // let { data } = res_create_key;
-              // values.privateKey = data.privatekey
-
-              // let res_token = await axios({
-              //   method: "post",
-              //   url: "http://localhost:8888/device/token",
-              //   data: {
-              //     device_id: values.devicesId
-              //   }
-              // })
-
-              // let data_token = res_token.data
-              // values.token = data_token.token
-              await db
-                .collection('devices')
-                .doc(values.deviceID)
-                .set({
-                  ...values,
-                  date: new Date().toISOString(),
-                })
-              // router.push(`/devices/${values.devicesID}`)
-
-              let deviceItem: any = {
-                actived: 'no',
-                auth: state.user.uid,
-                deiveID: values.deviceID,
-                device: db.doc('devices/' + values.deviceID),
-              }
-
-              // console.log(deviceItem)
-              // myDevices.push(deviceItem);
-              await db.collection('ownDevice').add(deviceItem)
-
->>>>>>> 5f04b8245b814d5c64d6824e5edfcf59de2ab1ad
               toaster.positive(
                 <div className={css({ ...theme.typography.font200 })}>
                   Thêm thiết bị thành công!
