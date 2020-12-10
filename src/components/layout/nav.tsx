@@ -11,10 +11,10 @@ export const Nav: React.FC<{}> = () => {
   const { state, signout }: any = useAuth()
   const history = useHistory();
 
-  function logout() {
-    history.push('/')
-    signout()
-  }
+  // function logout() {
+  //   history.push('/')
+  //   signout()
+  // }
 
   console.log(state);
   return (
@@ -54,7 +54,10 @@ export const Nav: React.FC<{}> = () => {
           <Paragraph2 marginRight="scale300" color="scale900">
             {state.user.email}
           </Paragraph2>
-          <Button size="compact" onClick={() => logout()} kind="secondary">
+          <Button size="compact" onClick={() => {
+            history.push('/')
+            signout()
+          }} kind="secondary">
             Đăng xuất
           </Button>
         </div>

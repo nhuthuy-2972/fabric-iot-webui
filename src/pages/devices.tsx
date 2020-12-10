@@ -1,46 +1,94 @@
 import * as React from 'react'
-import { useParams, Route } from 'react-router-dom'
+import { useParams, useHistory } from 'react-router-dom'
 import StreamDevices from '../components/devices/stream'
 import { useStyletron } from 'baseui'
+import { toaster } from 'baseui/toast'
 import { fbase, useAuth } from '../hooks/use-auth'
 import { db } from '../hooks/use-auth'
-import IndexPage from '.'
-import { FastField } from 'formik'
-
-
-const DevicesPage: React.FC<{}> = () => {
+import dotenv from 'dotenv'
+import axios from 'axios'
+dotenv.config()
+const DevicesPage = () => {
   const [css, theme] = useStyletron()
-  const { id }: any = useParams();
-  console.log("params ne : ", id)
+  const { typeDevice, id }: any = useParams()
+  // const par: any = useParams()
+  // console.log('prarams', par)
+  // console.log('params ne : ', typeDevice, id)
   const { state }: any = useAuth()
-  console.log("state ne :", state)
-  const [check, setcheck] = React.useState(Boolean)
+  console.log('state ne :', state)
+  // const [check, setcheck] = React.useState(Boolean)
   const [infoDevice, setInfo] = React.useState({})
+  const router = useHistory()
 
   React.useEffect(() => {
     const getdata = async () => {
-      console.log(id)
-      let docs = db.collection('ownDevice').where("auth", '==', state.user.uid).where("deviceID", '==', id)
-      docs.get().then((doc: any) => {
-
-        console.log(doc.size)
-        if (doc.size > 0) {
-          doc.forEach((dev: any) => {
-            const devdata = dev.data()
-            const infooo = { user: devdata.bcUser, channel: devdata.bcChannel, org: devdata.bcOrg }
-            setInfo(infooo)
-          });
-          setcheck(true)
-          console.log('yes!');
-        } else {
-          console.log('Document data:', doc.data());
-          setcheck(false)
-        }
-      })
-        .catch(err => {
-          console.log('Error getting document', err);
-          setcheck(false)
-        });
+      let docs = db
+        .collection('bcAccounts')
+        .where('auth', '==', state.user.uid)
+        .where('deviceID', '==', id)
+      docs
+        .get()
+        .then((doc: any) => {
+          let info: any = {}
+          console.log(doc.size)
+          if (doc.size > 0) {
+            doc.forEach((dev: any) => {
+              const devdata = dev.data()
+              info = {
+                bcIdentity: devdata.bcIdentity,
+              }
+              setInfo(info)
+            })
+            console.log('co infoi roi ne ', info)
+            if (sessionStorage.getItem(state.user.uid + id) === null) {
+              console.log('khong co token')
+              console.log('co infoi roi ne ', info.bcIdentity)
+              axios({
+                method: 'post',
+                headers: {
+                  Authorization: 'Bearer ' + state.customClaims.token,
+                },
+                url: 'http://localhost:4002/api/user/gettoken',
+                data: {
+                  bcIdentity: info.bcIdentity,
+                  deviceID: id,
+                },
+              })
+                .then((resulttoken) => {
+                  console.log(resulttoken.data.token)
+                  sessionStorage.setItem(
+                    state.user.uid + id,
+                    resulttoken.data.token,
+                  )
+                })
+                .catch((err) => {
+                  console.log('ra loi r ne ', err)
+                  toaster.negative(
+                    'Thiết bị chưa được kích hoạt hoặc không có kết nối. Vui lòng thử lại sau',
+                    {
+                      autoHideDuration: 5000,
+                    },
+                  )
+                  router.replace('/')
+                })
+            }
+            // setcheck(true)
+            console.log('yes!')
+          } else {
+            toaster.warning('Thiết bị không tồn tại!', {
+              autoHideDuration: 5000,
+            })
+            router.replace(`/`)
+          }
+        })
+        .catch((err) => {
+          console.log('Error getting document', err)
+          // setcheck(false)
+          toaster.warning(`Đã xãy ra lỗi : ${err}`, {
+            autoHideDuration: 5000,
+          })
+          router.replace(`/`)
+        })
     }
     getdata()
   }, [])
@@ -55,7 +103,8 @@ const DevicesPage: React.FC<{}> = () => {
         margin: `${theme.sizing.scale600} auto`,
       })}
     >
-      {check == true ? <StreamDevices info={infoDevice}></StreamDevices> : React.Fragment}
+      <StreamDevices info={infoDevice}></StreamDevices>
+      {/* {check == true ? <StreamDevices info={infoDevice}></StreamDevices> : React.Fragment} */}
     </div>
   )
 }

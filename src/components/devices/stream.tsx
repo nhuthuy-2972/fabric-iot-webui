@@ -1,44 +1,57 @@
 import * as React from 'react'
 import { DeepstreamClient } from '@deepstream/client'
 import { useStyletron } from 'baseui'
-import { Button } from 'baseui/button'
-import moment from 'moment';
+// import { Button } from 'baseui/button'
+// import moment from 'moment'
 import axios from 'axios'
-import { useParams, } from "react-router-dom";
+import { useParams } from 'react-router-dom'
 import { db, useAuth } from '../../hooks/use-auth'
 import Display from './display'
-import { Settings } from 'react-feather';
-import {
-  Modal,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  ModalButton,
-  FocusOnce,
-} from 'baseui/modal';
-import { Input, SIZE } from "baseui/input";
-moment().zone(7)
+// // import { Settings } from 'react-feather';
+// import {
+//   Modal,
+//   ModalHeader,
+//   ModalBody,
+//   ModalFooter,
+//   ModalButton,
+//   FocusOnce,
+// } from 'baseui/modal'
+// import { Input, SIZE } from 'baseui/input'
+import createAuthRefreshInterceptor from 'axios-auth-refresh'
+
+// moment().zone(7)
 
 const StreamDevices = ({ info }: any) => {
-  const [css, theme] = useStyletron();
+  const [css, theme] = useStyletron()
   const [data, setData]: any = React.useState(Object)
-  const { id }: any = useParams()
+  const { typeDevice, id }: any = useParams()
   const [history, sethistory] = React.useState(Object)
-  const [fields, setfields] = React.useState(Array);
-  const [private_key, setPrivate_key] = React.useState(Array);
-  const [token, setToken] = React.useState(Array);
+  const [fields, setfields] = React.useState(Array)
   const [device, setdevice] = React.useState(Object)
   const [isOpen, setOpen] = React.useState(false)
   const { state }: any = useAuth()
   React.useEffect(() => {
-
     const client = new DeepstreamClient('localhost:6020')
     client.login()
     const record = client.record.getRecord('news')
     function getds() {
+      const refreshAuthToken = (failedRequest: any) => {
+        axios({
+          method: 'post',
+          url: 'http://localhost:4002/api/user/gettoken',
+          data: {},
+        }).then((tokenRefreshResponse: any) => {
+          // localStorage.setItem('token', tokenRefreshResponse.data.token);
+          console.log('token respone', tokenRefreshResponse)
+          failedRequest.response.config.headers['Authorization'] =
+            'Bearer ' + tokenRefreshResponse.data.token
+          return Promise.resolve()
+        })
+      }
       record.subscribe(`news/${id}`, async (value: any) => {
         await setData(value)
-        console.log("valuene ", value)
+        console.log('valuene ', value)
+
         // axios({
         //   method: 'post',
         //   url: 'http://localhost:9997/api/device/datadevice',
@@ -83,65 +96,64 @@ const StreamDevices = ({ info }: any) => {
         //   console.log("Postgres", data.data)
         // })
         //   .catch(er => { console.log("hhh", er) })
-        axios({
-          method: 'post',
-          url: 'http://localhost:4002/api/auth/register',
-          // url: 'http://6a5d8441b61a.ngrok.io/api/getdata',
-          headers: {
-            'Authorization': `Bearer ${state.customClaims.token}`
-          },
-          data: {
-            deviceID: id,
-            userAccount: "plnhuy1507@gmail.com",
-            channel: "chanelid",
-            sensors: ["temperature", "ph"]
-          }
-        }).then(data => {
-          console.log("Postgres", data.data)
-        })
-          .catch(er => { console.log("hhh", er) })
+        // axios({
+        //   method: 'post',
+        //   url: 'http://localhost:4002/api/auth/register',
+        //   // url: 'http://6a5d8441b61a.ngrok.io/api/getdata',
+        //   headers: {
+        //     'Authorization': `Bearer ${state.customClaims.token}`
+        //   },
+        //   data: {
+        //     deviceID: id,
+        //     userAccount: "taib1606931@student.ctu.edu.vn",
+        //     channel: "chanelid1",
+        //     sensors: ["temperature", "ph"]
+        //   }
+        // }).then(data => {
+        //   console.log("Postgres", data.data)
+        // })
+        //   .catch(er => { console.log("hhh", er) })
       })
     }
-    getds();
+    getds()
 
     return () => {
       record.unsubscribe(`news/${id}`, () => console.log('offline'))
     }
   }, [])
 
-
-
   React.useEffect(() => {
-    console.log("set fields")
+    console.log('set fields')
     const getdata = async () => {
-      let docs = db.collection('devices').doc(id);
-
-      await docs.get().then(async doc => {
-        if (!doc.exists) {
-          console.log('No such document!');
-        } else {
-          // console.log('Document data:', doc.get('data_fields'));
-          let field = doc.get('data_fields')
-          // setPrivate_key(doc.get('privateKey'))
-          // setToken(doc.get('token'))
-          setfields(field)
-          setdevice({ name: doc.get('name'), desc: doc.get('desc') })
-        }
-      })
-        .catch(err => {
-          console.log('Error getting document', err);
-        });
+      let docs = db.collection('device').doc(id)
+      await docs
+        .get()
+        .then(async (doc) => {
+          if (!doc.exists) {
+            console.log('No such document!')
+          } else {
+            let field = doc.get('data_fields')
+            // setPrivate_key(doc.get('privateKey'))
+            // setToken(doc.get('token'))
+            setfields(field)
+            setdevice({ name: doc.get('name'), desc: doc.get('desc') })
+          }
+        })
+        .catch((err) => {
+          console.log('Error getting document', err)
+        })
     }
     getdata()
   }, [])
 
+  console.log('info ne', info)
 
-  console.log("info ne", info);
+  console.log('typedevice ne', typeDevice)
   //console.log("fields", fields)
-  console.log("name", device)
-  console.log("history", history)
+  console.log('name', device)
+  console.log('history', history)
   return (
-    < div className={css({})} >
+    <div className={css({})}>
       <div
         className={css({
           display: 'flex',
@@ -150,7 +162,8 @@ const StreamDevices = ({ info }: any) => {
         })}
       >
         <div className={css({ ...theme.typography.font550 })}>
-          {`${device.name || "X iot"} (${device.desc || ""})`} Batery : {data.batery} %
+          {`${device.name || 'X iot'} (${device.desc || ''})`} Batery :{' '}
+          {data.batery} %
         </div>
         {/* <Button
           onClick={() => setOpen(true)}
@@ -190,7 +203,6 @@ const StreamDevices = ({ info }: any) => {
           <ModalFooter>
           </ModalFooter>
         </Modal> */}
-
       </div>
 
       <div
@@ -201,11 +213,18 @@ const StreamDevices = ({ info }: any) => {
           gridTemplateColumns: '0.35fr 1fr',
         })}
       >
-        {
-          fields!.map((ite: any, i) => { return <Display key={Math.random() * 10 + i} field={ite} data={data} history={history} ></Display> })
-        }
+        {fields!.map((ite: any, i) => {
+          return (
+            <Display
+              key={Math.random() * 10 + i}
+              field={ite}
+              data={data}
+              history={history}
+            ></Display>
+          )
+        })}
       </div>
-    </div >
+    </div>
   )
 }
 

@@ -25,7 +25,7 @@ const App: React.FC<{}> = () => {
                   <Route exact path="/">
                     <IndexPage />
                   </Route>
-                  <Route exact path="/devices/:id">
+                  <Route exact path="/devices/:typeDevice?/:id?">
                     <DevicesPage />
                   </Route>
                 </Switch>

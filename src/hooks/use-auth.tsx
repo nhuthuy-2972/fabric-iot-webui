@@ -64,7 +64,7 @@ function useProvideAuth() {
         .currentUser!.getIdTokenResult();
 
       setState({ initializing: false, user, customClaims: tokenResult })
-
+      
     } else {
       console.log("NO change");
       setState({
@@ -123,6 +123,7 @@ function useProvideAuth() {
   }
   const signout = () => {
     //history.push('/')
+    sessionStorage.clear();
     return firebase.auth().signOut()
   }
 
