@@ -1,8 +1,9 @@
 import * as React from 'react'
-import { withStyle, useStyletron } from 'baseui'
-import { StyledTable, StyledHeadCell, StyledBodyCell } from 'baseui/table-grid'
-import { Tag } from 'baseui/tag'
+import {  useStyletron } from 'baseui'
+// import { StyledTable, StyledHeadCell, StyledBodyCell} from 'baseui/table-grid'
+// import { Tag } from 'baseui/tag'
 import { Button } from 'baseui/button'
+import {DevicesTable} from './table'
 
 import nanoid from 'nanoid'
 import { PlusCircle, Plus, X, RotateCcw, Search } from 'react-feather'
@@ -19,165 +20,12 @@ import { Label2, Paragraph2 } from 'baseui/typography'
 import { Input } from 'baseui/input'
 import { FormControl } from 'baseui/form-control'
 import { toaster } from 'baseui/toast'
-import { db, fbase } from '../hooks/use-auth'
+import { db } from '../hooks/use-auth'
 import { useAuth } from '../hooks/use-auth'
 import { useHistory } from 'react-router-dom'
 import { StyledSpinnerNext } from 'baseui/spinner'
-
 import axios from 'axios'
 import { Radio, RadioGroup } from 'baseui/radio'
-
-const CenteredBodyCell = withStyle(StyledBodyCell, ({ $theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'flex-end',
-  textAlign: 'right',
-  paddingTop: $theme.sizing.scale500,
-  paddingBottom: $theme.sizing.scale500,
-}))
-
-const CenteredBodyCellLeft = withStyle(StyledBodyCell, {
-  display: 'flex',
-  alignItems: 'center',
-})
-
-const HeadCellLeft = withStyle(StyledHeadCell, ({ $theme }) => ({
-  boxShadow: 'none',
-  backgroundColor: $theme.colors.positive,
-  borderWidth: '0px',
-  color: $theme.colors.mono100,
-}))
-
-const NewStyledTable = withStyle(StyledTable, ({ $theme }) => ({
-  ...$theme.borders.border200,
-  height: 'auto',
-  overflowX: 'auto',
-  backgroundColor: $theme.colors.mono100,
-  borderTopLeftRadius: $theme.sizing.scale400,
-  borderTopRightRadius: $theme.sizing.scale400,
-  borderBottomLeftRadius: $theme.sizing.scale400,
-  borderBottomRightRadius: $theme.sizing.scale400,
-  boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
-}))
-
-const Row = ({ striped, row, type }: any) => {
-  const [css, theme] = useStyletron()
-  const router = useHistory()
-  return (
-    <>
-      <CenteredBodyCellLeft $striped={striped}>
-        <div
-          className={css({
-            textAlign: 'left',
-            ...theme.typography.font300,
-            textOverflow: 'ellipsis',
-            overflow: 'hidden',
-            whiteSpace: 'nowrap',
-          })}
-        >
-          {row.deviceID}
-        </div>
-      </CenteredBodyCellLeft>
-      <CenteredBodyCellLeft $striped={striped}>
-        <div
-          className={css({
-            textAlign: 'left',
-            ...theme.typography.font300,
-            textOverflow: 'ellipsis',
-            overflow: 'hidden',
-            whiteSpace: 'nowrap',
-          })}
-        >
-          {row.name}
-        </div>
-      </CenteredBodyCellLeft>
-      <CenteredBodyCellLeft $striped={striped}>
-        <div
-          className={css({
-            textAlign: 'left',
-            ...theme.typography.font300,
-            textOverflow: 'ellipsis',
-            overflow: 'hidden',
-            whiteSpace: 'nowrap',
-          })}
-        >
-          {row.desc}
-        </div>
-      </CenteredBodyCellLeft>
-      <CenteredBodyCellLeft $striped={striped}>
-        <div
-          className={css({
-            textAlign: 'left',
-            ...theme.typography.font300,
-            textOverflow: 'ellipsis',
-            overflow: 'hidden',
-            whiteSpace: 'nowrap',
-          })}
-        >
-          {row.actived === 'yes' ? (
-            <Tag closeable={false} variant="outlined" kind={'positive'}>
-              {'Actived yet'}
-            </Tag>
-          ) : (
-            <Tag closeable={false} variant="outlined" kind={'warning'}>
-              {'Not actived'}
-            </Tag>
-          )}
-        </div>
-      </CenteredBodyCellLeft>
-      <CenteredBodyCellLeft $striped={striped}>
-        {row.actived === 'yes' ? (
-          <Button
-            size="compact"
-            kind="tertiary"
-            onClick={() => {
-              router.push(`/devices/${type}/${row.deviceID}`)
-            }}
-          >
-            Xem
-          </Button>
-        ) : (
-          <Button
-            size="compact"
-            kind="tertiary"
-            onClick={() => {
-              router.push(`/devices/${type}/${row.deviceID}`)
-            }}
-            disabled
-          >
-            Xem
-          </Button>
-        )}
-      </CenteredBodyCellLeft>
-    </>
-  )
-}
-
-export const DevicesTable = ({ devices, type }: any) => {
-  const [css, theme] = useStyletron()
-
-  return (
-    <div
-      className={css({
-        marginTop: theme.sizing.scale400,
-        marginBottom: theme.sizing.scale400,
-      })}
-    >
-      <NewStyledTable $gridTemplateColumns="auto auto auto auto auto">
-        <HeadCellLeft $sticky={false}>ID</HeadCellLeft>
-        <HeadCellLeft $sticky={false}>Tên thiết bị</HeadCellLeft>
-        <HeadCellLeft $sticky={false}>Miêu tả</HeadCellLeft>
-        <HeadCellLeft $sticky={false}>Trạng thái</HeadCellLeft>
-        <HeadCellLeft $sticky={false}>Hành động</HeadCellLeft>
-
-        {devices!.map((row: any, index: any) => {
-          const striped = (index + 1) % 2 === 0
-          return <Row key={index} row={row} striped={striped} type={type} />
-        })}
-      </NewStyledTable>
-    </div>
-  )
-}
 
 const IndexPage = () => {
   const [css, theme] = useStyletron()
@@ -188,97 +36,149 @@ const IndexPage = () => {
   const [isOpen, setIsOpen] = React.useState(false)
   const { state }: any = useAuth()
   const [isload, setload] = React.useState(false)
-  const inputRef = React.useRef<HTMLInputElement>(null)
-  const [value, setValue] = React.useState('deviceID')
+  const inputRefOwn = React.useRef<HTMLInputElement>(null)
+  const inputRefShare = React.useRef<HTMLInputElement>(null)
+  const [valueOwn, setValueOwn] = React.useState('deviceID')
+  const [valueShare, setValueShare] = React.useState('deviceID')
 
-  const testfun = async () => {
-    // db.collection('device')
-    //   .add({
-    //     actived: 'no',
-    //     auth: state.user.uid,
-    //     name: 'name ne',
-    //     desc: 'mieu ta ne',
-    //     refUser: [],
-    //   })
-    //   .catch((err) => {
-    //     console.log(err)
-    //   })
-    // db.collection('device')
-    //   .doc("BEYrnnNHj2f3hgQiLkL4")
-    //   .get()
-    //   .then((doc : any)=>{
-    //     if(doc.exit())
-    //   })
-    db.collection('device')
-      .add({
-        actived: 'no',
-        auth: state.user.uid,
-        name: 'name ne',
-        desc: 'mieu ta ne',
-        refUser: [],
-      })
-      .catch((err) => {
-        console.log(err)
-      })
-  }
+  // const testfun = async () => {
+  //   // db.collection('device')
+  //   //   .add({
+  //   //     actived: 'no',
+  //   //     auth: state.user.uid,
+  //   //     name: 'name ne',
+  //   //     desc: 'mieu ta ne',
+  //   //     refUser: [],
+  //   //   })
+  //   //   .catch((err) => {
+  //   //     console.log(err)
+  //   //   })
+  //   // db.collection('device')
+  //   //   .doc("BEYrnnNHj2f3hgQiLkL4")
+  //   //   .get()
+  //   //   .then((doc : any)=>{
+  //   //     if(doc.exit())
+  //   //   })
+  //   db.collection('device')
+  //     .add({
+  //       actived: 'no',
+  //       auth: state.user.uid,
+  //       name: 'name ne',
+  //       desc: 'mieu ta ne',
+  //       refUser: [],
+  //     })
+  //     .catch((err) => {
+  //       console.log(err)
+  //     })
+  // }
 
-  const searchbutton = async () => {
+  const searchbutton1 = async (e:any,type:String) => {
+    // console.log(e)
+    e.preventDefault();
     const result: any = []
+    console.log(type)
+
+    const inputRef = type === "searchOwn" ? inputRefOwn : inputRefShare;
+
     if (inputRef.current?.value !== '') {
       console.log(inputRef.current?.value)
       const searchinput = inputRef.current?.value
-      const fieldcompare = value
+      const fieldcompare = type === "searchOwn" ? valueOwn : valueShare;
       console.log(fieldcompare)
-      if (fieldcompare === 'deviceID') {
-        await db
-          .collection('device')
-          .doc(searchinput)
-          .get()
-          .then((doc: any) => {
-            if (doc.exists) {
-              let data = doc.data()
-              data.deviceID = doc.id
-              result.push(data)
-              setDevices(result)
-            } else {
-              setDevices(result)
-            }
-          })
-          .catch((err) => {
-            console.log(err)
-            setDevices(result)
-          })
-      } else {
-        console.log('do day')
-        await db
-          .collection('device')
-          .where('auth', '==', state.user.uid)
-          .where(fieldcompare, '==', searchinput)
-          .get()
-          .then((snapshot: any) => {
-            snapshot.forEach(async (doc: any) => {
-              const data = doc.data()
-              data.deviceID = doc.id
-              result.push(data)
-            })
-            setDevices(result)
-          })
-          .catch((err) => {
-            console.log(err)
-            setDevices(result)
-          })
+      const listdevice:any  = type === "searchOwn" ?  devices : linkedDevices;
+      
+      if(fieldcompare === 'deviceID')
+      {
+        for(let i in listdevice )
+        {
+          // const deviceID: any = listdevice[i].deviceID
+          // console.log(deviceID)
+          if(listdevice[i].deviceID.includes(searchinput)){
+            console.log('co chua')
+            result.push(listdevice[i])
+          }
+        }
+        type === "searchOwn" ? setDevices(result) : setLinkedDevices(result)
+      }else if (fieldcompare === 'name'){
+        for(let i in listdevice )
+        {
+          // const deviceID: any = listdevice[i].deviceID
+           console.log(listdevice[i])
+          if(listdevice[i].name.includes(searchinput)){
+            console.log('co chua')
+            result.push(listdevice[i])
+          }
+        }
+        type === "searchOwn" ? setDevices(result) : setLinkedDevices(result)
+      }else{
+        type === "searchOwn" ? setDevices(result) : setLinkedDevices(result)
       }
-    } else {
-      console.log('rong')
-      return inputRef.current && inputRef.current.focus()
-    }
+  }else {
+    console.log('rong')
+    return inputRef.current && inputRef.current.focus()
   }
+}
 
-  const reloadbutton = () => {
+
+  // const searchbutton = async () => {
+  //   const result: any = []
+  //   if (inputRefOwn.current?.value !== '') {
+  //     console.log(inputRefOwn.current?.value)
+  //     const searchinput = inputRefOwn.current?.value
+  //     const fieldcompare = valueOwn
+  //     console.log(fieldcompare)
+  //     if (fieldcompare === 'deviceID') {
+  //       await db
+  //         .collection('device')
+  //         .doc(searchinput)
+  //         .get()
+  //         .then((doc: any) => {
+  //           if (doc.exists) {
+  //             let data = doc.data()
+  //             data.deviceID = doc.id
+  //             result.push(data)
+  //             setDevices(result)
+  //           } else {
+  //             setDevices(result)
+  //           }
+  //         })
+  //         .catch((err) => {
+  //           console.log(err)
+  //           setDevices(result)
+  //         })
+  //     } else {
+  //       console.log('do day')
+  //       await db
+  //         .collection('device')
+  //         .where('auth', '==', state.user.uid)
+  //         .where(fieldcompare, '==', searchinput)
+  //         .get()
+  //         .then((snapshot: any) => {
+  //           snapshot.forEach(async (doc: any) => {
+  //             const data = doc.data()
+  //             data.deviceID = doc.id
+  //             result.push(data)
+  //           })
+  //           setDevices(result)
+  //         })
+  //         .catch((err) => {
+  //           console.log(err)
+  //           setDevices(result)
+  //         })
+  //     }
+  //   } else {
+  //     console.log('rong')
+  //     return inputRefOwn.current && inputRefOwn.current.focus()
+  //   }
+  // }
+
+  const reloadbutton = (e:any,type :String) => {
+    e.preventDefault();
+
+    const snapshot:any = type === 'reloadOwn' ? db.collection('device').where('auth', '==', state.user.uid):
+    db.collection('device').where('refUser', 'array-contains', state.user.uid);
     let arrdevice: any = []
-    db.collection('device')
-      .where('auth', '==', state.user.uid)
-      .get()
+      snapshot.get()
       .then((snapshot: any) => {
         snapshot.forEach(async (doc: any) => {
           const data = doc.data()
@@ -287,9 +187,9 @@ const IndexPage = () => {
           arrdevice.push(data)
         })
 
-        setDevices(arrdevice)
+        type === 'reloadOwn' ? setDevices(arrdevice) :setLinkedDevices(arrdevice)
       })
-      .catch(function (error) {
+      .catch(function (error:any) {
         console.log('Error getting documents: ', error)
       })
   }
@@ -332,7 +232,7 @@ const IndexPage = () => {
   return (
     <div
       className={css({
-        maxWidth: '1200px',
+        maxWidth: '1300px',
         padding: theme.sizing.scale400,
         margin: `${theme.sizing.scale600} auto`,
       })}
@@ -361,12 +261,16 @@ const IndexPage = () => {
           )}
           overrides={{
             BaseButton: {
-              style: {
-                borderTopLeftRadius: theme.sizing.scale400,
+              style: ({
+                backgroundColor: theme.colors.contentInverseSecondary,
                 borderBottomRightRadius: theme.sizing.scale600,
-              },
-            },
+                borderTopLeftRadius: theme.sizing.scale400,
+                // color : theme.colors.mono100,
+                
+              })
+            }
           }}
+          
         >
           Thêm thiết bị
         </Button>
@@ -375,46 +279,74 @@ const IndexPage = () => {
       <div
         className={css({
           display: 'flex',
-          justifyContent: 'space-between',
+          justifyContent: 'flex-left',
           alignItems: 'center',
           marginBottom: theme.sizing.scale600,
         })}
       >
         <Input
-          inputRef={inputRef}
+          inputRef={inputRefOwn}
           placeholder="Nhập ID hoặc tên để tìm kiếm thiết bi"
           overrides={{
             Root: {
               style: {
                 width: '30%',
-                marginRight: theme.sizing.scale600,
+                marginRight: theme.sizing.scale700,
+                
               },
             },
+            
           }}
         />
         <RadioGroup
           align="horizontal"
           name="horizontal"
-          onChange={(e) => setValue(e.target.value)}
-          value={value}
+          overrides={{
+            Root: {
+              style: {
+                marginRight: theme.sizing.scale700,
+              },
+            },
+          }}
+          onChange={(e) => setValueOwn(e.target.value)}
+          value={valueOwn}
         >
-          <Radio value="deviceID">ID thiết bị</Radio>
-          <Radio value="name">Tên thiết bị</Radio>
+          <Radio value="deviceID" overrides={{
+        RadioMarkOuter: {
+          style: ({ $theme }) => {
+            return {
+              backgroundColor: $theme.colors.contentInverseSecondary
+            };
+          }
+        }
+      }}>ID thiết bị</Radio>
+          <Radio value="name" overrides={{
+        RadioMarkOuter: {
+          style: ({ $theme }) => {
+            return {
+              backgroundColor: $theme.colors.contentInverseSecondary
+            };
+          }
+        }
+      }}>Tên thiết bị</Radio>
         </RadioGroup>
         <Button
           kind={'secondary'}
           overrides={{
             BaseButton: {
               style: {
+                backgroundColor: theme.colors.contentInverseSecondary,
+                // color : theme.colors.mono700,
                 borderTopLeftRadius: theme.sizing.scale400,
                 borderBottomRightRadius: theme.sizing.scale400,
+                marginRight : theme.sizing.scale400
               },
             },
           }}
           startEnhancer={() => (
             <Search color={theme.colors.mono700} size={18} />
           )}
-          onClick={searchbutton}
+          onClick={(e)=>searchbutton1(e,'searchOwn')}
         >
           Tim kiếm
         </Button>
@@ -425,13 +357,15 @@ const IndexPage = () => {
               style: {
                 borderTopLeftRadius: theme.sizing.scale400,
                 borderBottomRightRadius: theme.sizing.scale400,
+                backgroundColor: theme.colors.contentInverseSecondary,
+                // color : theme.colors.mono100,
               },
             },
           }}
           startEnhancer={() => (
             <RotateCcw color={theme.colors.mono700} size={18} />
           )}
-          onClick={reloadbutton}
+          onClick={(e)=>reloadbutton(e,"reloadOwn")}
         >
           Tải lại
         </Button>
@@ -466,17 +400,122 @@ const IndexPage = () => {
       )}
 
       {devices !== 'loading' && devices.length > 0 && (
-        <DevicesTable devices={devices} type={'own'} />
+        <DevicesTable devices={devices}  type="own"/>
       )}
 
       <div
         className={css({
           ...theme.typography.font650,
           marginBottom: theme.sizing.scale600,
+          marginTop : theme.sizing.scale1000
         })}
       >
         DANH SÁCH THIẾT BỊ ĐƯỢC CHIA SẼ
       </div>
+
+      <div
+        className={css({
+          display: 'flex',
+          justifyContent: 'flex-left',
+          alignItems: 'center',
+          marginBottom: theme.sizing.scale600,
+        })}
+      >
+        <Input
+          inputRef={inputRefShare}
+          placeholder="Nhập ID hoặc tên để tìm kiếm thiết bi"
+          overrides={{
+            Root: {
+              style: {
+                width: '30%',
+                marginRight: theme.sizing.scale700,
+              },
+            },
+          }}
+        />
+        <RadioGroup
+          align="horizontal"
+          name="horizontal"
+          overrides={{
+            Root: {
+              style: {
+                marginRight: theme.sizing.scale700,
+              },
+            },
+          }}
+          onChange={(e) => setValueShare(e.target.value)}
+          value={valueShare}
+        >
+          <Radio value="deviceID" overrides={{
+        RadioMarkOuter: {
+          style: ({ $theme }) => {
+            return {
+              backgroundColor: $theme.colors.contentInverseSecondary
+            };
+          }
+        }
+      }}>ID thiết bị</Radio>
+          <Radio value="name" overrides={{
+        RadioMarkOuter: {
+          style: ({ $theme }) => {
+            return {
+              backgroundColor: $theme.colors.contentInverseSecondary
+            };
+          }
+        }
+      }}>Tên thiết bị</Radio>
+        </RadioGroup>
+        <Button
+          kind={'secondary'}
+          overrides={{
+            BaseButton: {
+              style: {
+                backgroundColor : theme.colors.contentInverseSecondary,
+                borderTopLeftRadius: theme.sizing.scale400,
+                borderBottomRightRadius: theme.sizing.scale400,
+                marginRight : theme.sizing.scale400
+              },
+            },
+          }}
+          startEnhancer={() => (
+            <Search color={theme.colors.mono700} size={18} />
+          )}
+          onClick={(e)=>searchbutton1(e,"searchShare")}
+        >
+          Tim kiếm
+        </Button>
+        <Button
+          kind={'secondary'}
+          overrides={{
+            BaseButton: {
+              style: {
+                backgroundColor : theme.colors.contentInverseSecondary,
+                borderTopLeftRadius: theme.sizing.scale400,
+                borderBottomRightRadius: theme.sizing.scale400,
+              },
+            },
+          }}
+          startEnhancer={() => (
+            <RotateCcw color={theme.colors.mono700} size={18} />
+          )}
+          onClick={(e)=>reloadbutton(e,"reloadShare")}
+        >
+          Tải lại
+        </Button>
+      </div>
+      {linkedDevices === 'loading' && (
+        <div
+          className={css({
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '30vh',
+          })}
+        >
+          <StyledSpinnerNext />
+        </div>
+      )}
+
       {linkedDevices !== 'loading' && linkedDevices.length === 0 && (
         <div
           className={css({
@@ -491,11 +530,13 @@ const IndexPage = () => {
           <Paragraph2>Không có thiết bị linked</Paragraph2>
         </div>
       )}
-
+      
       {linkedDevices !== 'loading' && linkedDevices.length > 0 && (
-        <DevicesTable devices={linkedDevices} type={'link'} />
+        <DevicesTable devices={linkedDevices}  />
       )}
       {/* add device modal */}
+
+     
       <Modal
         unstable_ModalBackdropScroll={true}
         closeable={false}

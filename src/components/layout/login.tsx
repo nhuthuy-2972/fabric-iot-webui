@@ -1,10 +1,7 @@
 import React from 'react'
 import { fbase } from '../../hooks/use-auth'
-<<<<<<< HEAD
 import { toaster } from 'baseui/toast'
-=======
-import {toaster} from 'baseui/toast'
->>>>>>> 5f04b8245b814d5c64d6824e5edfcf59de2ab1ad
+
 import {
   MDBNavbar,
   MDBNavbarBrand,
@@ -12,10 +9,6 @@ import {
   MDBCollapse,
   MDBNavbarNav,
   MDBNavItem,
-<<<<<<< HEAD
-=======
-  MDBNavLink,
->>>>>>> 5f04b8245b814d5c64d6824e5edfcf59de2ab1ad
   MDBContainer,
   MDBMask,
   MDBView,
@@ -29,14 +22,9 @@ import {
   MDBBtn,
 } from 'mdbreact'
 import { Typography } from '@material-ui/core'
-<<<<<<< HEAD
 import { Link } from 'react-scroll'
 
-=======
-import { Button } from 'baseui/button'
 
-import { Link } from 'react-scroll'
->>>>>>> 5f04b8245b814d5c64d6824e5edfcf59de2ab1ad
 export const LoginForm: React.FC<{}> = () => {
   let [isWideEnough, setIsWideEnough] = React.useState(false)
   let [collapse, setCollapse] = React.useState(false)
@@ -44,10 +32,7 @@ export const LoginForm: React.FC<{}> = () => {
     setCollapse(!collapse)
   }
   return (
-<<<<<<< HEAD
-=======
-    
->>>>>>> 5f04b8245b814d5c64d6824e5edfcf59de2ab1ad
+
     // <MDBBtn
     //   onClick={() => {
     //     fbase
@@ -100,7 +85,6 @@ export const LoginForm: React.FC<{}> = () => {
             <MDBCollapse isOpen={collapse} navbar>
               <MDBNavbarNav right>
                 <MDBNavItem active>
-<<<<<<< HEAD
                   <Link
                     activeClass="active"
                     to="top1"
@@ -111,21 +95,7 @@ export const LoginForm: React.FC<{}> = () => {
                   >
                     <h5>Home</h5>
                   </Link>
-=======
-                 {/* <MDBNavLink to="#">
-                    
-                </MDBNavLink> */}
-                <Link
-                      activeClass="active"
-                      to="top1"
-                      spy={true}
-                      smooth={true}
-                      offset={0}
-                      duration={500}
-                    >
-                      <h5>Home</h5>
-                    </Link>
->>>>>>> 5f04b8245b814d5c64d6824e5edfcf59de2ab1ad
+
                 </MDBNavItem>
                 <MDBNavItem>
                   <Link
@@ -136,11 +106,8 @@ export const LoginForm: React.FC<{}> = () => {
                     offset={0}
                     duration={500}
                   >
-<<<<<<< HEAD
                     About Us {/* <MDBNavLink to="#">About Us</MDBNavLink> */}
-=======
-                   About Us {/* <MDBNavLink to="#">About Us</MDBNavLink> */}
->>>>>>> 5f04b8245b814d5c64d6824e5edfcf59de2ab1ad
+
                   </Link>
                 </MDBNavItem>
                 <Link
@@ -151,12 +118,9 @@ export const LoginForm: React.FC<{}> = () => {
                   offset={0}
                   duration={500}
                 >
-<<<<<<< HEAD
                   <MDBNavItem>
                     Our Services
-=======
-                  <MDBNavItem>Our Services
->>>>>>> 5f04b8245b814d5c64d6824e5edfcf59de2ab1ad
+
                     {/* <MDBNavLink to="#">Our Services</MDBNavLink> */}
                   </MDBNavItem>
                 </Link>

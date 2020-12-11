@@ -22,8 +22,8 @@ export const Nav: React.FC<{}> = () => {
       <div
         className={css({
           maxHeight: '56px',
-          backgroundColor: 'white',
-          boxShadow: theme.lighting.shadow400,
+          backgroundColor: theme.colors.backgroundPrimary,
+          boxShadow: theme.lighting.shadow600,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -38,7 +38,7 @@ export const Nav: React.FC<{}> = () => {
           })}
         >
           <Link to="/">
-            <img height="40" alt="logo" src="/logo192.ico" />
+            <img height="40" alt="logo" src="/2152488.ico" />
           </Link>
         </div>
         <ul
@@ -51,13 +51,16 @@ export const Nav: React.FC<{}> = () => {
         >
         </ul>
         <div className={css({ display: 'flex' })}>
-          <Paragraph2 marginRight="scale300" color="scale900">
+          <Paragraph2 marginTop="scale300" marginRight="scale300" color="scale900">
             {state.user.email}
           </Paragraph2>
-          <Button size="compact" onClick={() => {
+          <Button size="compact"  onClick={() => {
             history.push('/')
             signout()
-          }} kind="secondary">
+          }} kind="secondary" shape="pill"
+          
+          
+          >
             Đăng xuất
           </Button>
         </div>
