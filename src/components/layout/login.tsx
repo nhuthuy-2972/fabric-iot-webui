@@ -26,7 +26,7 @@ import { Link } from 'react-scroll'
 
 
 export const LoginForm: React.FC<{}> = () => {
-  let [isWideEnough, setIsWideEnough] = React.useState(false)
+  // let [isWideEnough, setIsWideEnough] = React.useState(false)
   let [collapse, setCollapse] = React.useState(false)
   let onClick1 = () => {
     setCollapse(!collapse)
@@ -81,7 +81,7 @@ export const LoginForm: React.FC<{}> = () => {
             <MDBNavbarBrand href="#">
               <strong>Navbar</strong>
             </MDBNavbarBrand>
-            {!isWideEnough && <MDBNavbarToggler onClick={onClick1} />}
+            {true && <MDBNavbarToggler onClick={onClick1} />}
             <MDBCollapse isOpen={collapse} navbar>
               <MDBNavbarNav right>
                 <MDBNavItem active>
@@ -186,9 +186,7 @@ export const LoginForm: React.FC<{}> = () => {
                       </Typography>
                     </MDBCol>
                     <MDBCol size="6">
-                      <img
-                        src={process.env.PUBLIC_URL + '/images/services.png'}
-                      />
+                      <img src={process.env.PUBLIC_URL + '/images/services.png'} alt="#"/>
                     </MDBCol>
                   </MDBRow>
                 </MDBContainer>
@@ -399,6 +397,7 @@ export const LoginForm: React.FC<{}> = () => {
                     <img
                       style={{ height: '60vh' }}
                       src={process.env.PUBLIC_URL + '/images/3/login-right.svg'}
+                      alt="#"
                     />
                   </MDBCol>
                   <MDBCol size="6">

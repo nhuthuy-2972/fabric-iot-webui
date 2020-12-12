@@ -125,7 +125,7 @@ const StreamDevices = ({ info }: any) => {
     return () => {
       record.unsubscribe(`news/${id}`, () => console.log('offline'))
     }
-  }, [])
+  }, [id])
 
   React.useEffect(() => {
     console.log('set fields')
@@ -151,7 +151,7 @@ const StreamDevices = ({ info }: any) => {
         })
     }
     getdata()
-  }, [])
+  }, [id])
 
   console.log('info ne', info)
 

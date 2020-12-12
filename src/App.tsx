@@ -7,6 +7,7 @@ import { Provider as StyletronProvider } from 'styletron-react'//theme
 
 import IndexPage from './pages'
 import DevicesPage from './pages/devices'
+// import ManagerMiddleWare from './pages/shareDeviceManagerMiddleware'
 import { ProvideAuth } from './hooks/use-auth'
 import { Layout } from './components/layout'
 import { Theme } from './shared/theme'

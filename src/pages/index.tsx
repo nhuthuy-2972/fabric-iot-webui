@@ -1,11 +1,7 @@
 import * as React from 'react'
 import {  useStyletron } from 'baseui'
-// import { StyledTable, StyledHeadCell, StyledBodyCell} from 'baseui/table-grid'
-// import { Tag } from 'baseui/tag'
 import { Button } from 'baseui/button'
 import {DevicesTable} from './table'
-
-import nanoid from 'nanoid'
 import { PlusCircle, Plus, X, RotateCcw, Search } from 'react-feather'
 import {
   Modal,
@@ -14,33 +10,31 @@ import {
   ModalHeader,
   ModalBody,
 } from 'baseui/modal'
+import { toaster } from 'baseui/toast'
+import { db } from '../hooks/use-auth'
+import { useAuth } from '../hooks/use-auth'
+import axios from 'axios'
 import { FieldArray, Form, Formik } from 'formik'
 import { Block } from 'baseui/block'
 import { Label2, Paragraph2 } from 'baseui/typography'
 import { Input } from 'baseui/input'
 import { FormControl } from 'baseui/form-control'
-import { toaster } from 'baseui/toast'
-import { db } from '../hooks/use-auth'
-import { useAuth } from '../hooks/use-auth'
-import { useHistory } from 'react-router-dom'
 import { StyledSpinnerNext } from 'baseui/spinner'
-import axios from 'axios'
 import { Radio, RadioGroup } from 'baseui/radio'
-
+import {Checkbox,LABEL_PLACEMENT} from "baseui/checkbox";
+// import Yup from 'yup';
 const IndexPage = () => {
   const [css, theme] = useStyletron()
   const [devices, setDevices] = React.useState('loading')
 
   const [linkedDevices, setLinkedDevices] = React.useState('loading')
-  const router = useHistory()
   const [isOpen, setIsOpen] = React.useState(false)
   const { state }: any = useAuth()
-  const [isload, setload] = React.useState(false)
   const inputRefOwn = React.useRef<HTMLInputElement>(null)
   const inputRefShare = React.useRef<HTMLInputElement>(null)
   const [valueOwn, setValueOwn] = React.useState('deviceID')
   const [valueShare, setValueShare] = React.useState('deviceID')
-
+  const [warning,setWarning] = React.useState(false)
   // const testfun = async () => {
   //   // db.collection('device')
   //   //   .add({
@@ -71,6 +65,10 @@ const IndexPage = () => {
   //       console.log(err)
   //     })
   // }
+  // const phoneRegExp = /(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})\b/
+  // const displayError = Yup.object().shape({
+  //   phone_number: Yup.string().matches(phoneRegExp,'Sô điện thoại không hợp lệ')
+  // });
 
   const searchbutton1 = async (e:any,type:String) => {
     // console.log(e)
@@ -210,7 +208,7 @@ const IndexPage = () => {
         setDevices(arrdevice)
       })
     return () => unsubscribe()
-  }, [])
+  }, [state.user.uid])
 
   React.useEffect(() => {
     console.log('goi useffect')
@@ -227,7 +225,7 @@ const IndexPage = () => {
         setLinkedDevices(arrdevice)
       })
     return () => unsubscribe()
-  }, [])
+  }, [state.user.uid])
 
   return (
     <div
@@ -301,13 +299,13 @@ const IndexPage = () => {
         <RadioGroup
           align="horizontal"
           name="horizontal"
-          overrides={{
-            Root: {
-              style: {
-                marginRight: theme.sizing.scale700,
-              },
-            },
-          }}
+          // overrides={{
+          //   Root: {
+          //     style: {
+          //       marginRight: theme.sizing.scale700,
+          //     },
+          //   },
+          // }}
           onChange={(e) => setValueOwn(e.target.value)}
           value={valueOwn}
         >
@@ -339,7 +337,8 @@ const IndexPage = () => {
                 // color : theme.colors.mono700,
                 borderTopLeftRadius: theme.sizing.scale400,
                 borderBottomRightRadius: theme.sizing.scale400,
-                marginRight : theme.sizing.scale400
+                marginRight : theme.sizing.scale400,
+                marginLeft : theme.sizing.scale700
               },
             },
           }}
@@ -394,7 +393,7 @@ const IndexPage = () => {
             marginTop: theme.sizing.scale1000,
           })}
         >
-          <img width="300" src="/assets/no-devices.svg" />
+          <img width="300" src="/assets/no-devices.svg" alt="#"/>
           <Paragraph2>Không có thiết bị</Paragraph2>
         </div>
       )}
@@ -436,13 +435,13 @@ const IndexPage = () => {
         <RadioGroup
           align="horizontal"
           name="horizontal"
-          overrides={{
-            Root: {
-              style: {
-                marginRight: theme.sizing.scale700,
-              },
-            },
-          }}
+          // overrides={{
+          //   Root: {
+          //     style: {
+          //       marginRight: theme.sizing.scale700,
+          //     },
+          //   },
+          // }}
           onChange={(e) => setValueShare(e.target.value)}
           value={valueShare}
         >
@@ -473,7 +472,8 @@ const IndexPage = () => {
                 backgroundColor : theme.colors.contentInverseSecondary,
                 borderTopLeftRadius: theme.sizing.scale400,
                 borderBottomRightRadius: theme.sizing.scale400,
-                marginRight : theme.sizing.scale400
+                marginRight : theme.sizing.scale400,
+                marginLeft : theme.sizing.scale700
               },
             },
           }}
@@ -526,7 +526,7 @@ const IndexPage = () => {
             marginTop: theme.sizing.scale1000,
           })}
         >
-          <img width="300" src="/assets/no-devices.svg" />
+          <img width="300" src="/assets/no-devices.svg" alt="#"/>
           <Paragraph2>Không có thiết bị linked</Paragraph2>
         </div>
       )}
@@ -543,11 +543,12 @@ const IndexPage = () => {
         isOpen={isOpen}
         animate
         autoFocus
-        size="default"
+        size="auto"
         role="dialog"
         overrides={{
           Dialog: {
             style: {
+              width : '800px',
               borderTopLeftRadius: theme.sizing.scale400,
               borderBottomRightRadius: theme.sizing.scale400,
             },
@@ -555,22 +556,55 @@ const IndexPage = () => {
         }}
       >
         <Formik
+          
           initialValues={{
             name: '',
-            deviceID: nanoid(),
             desc: '',
+            warning : false,
+            phone_number: '',
             data_fields: [
               {
                 field_display: '',
                 field_name: '',
                 field_unit: '',
+                min : '',
+                max : ''
               },
+              // {
+              //   field_display: 'pH',
+              //   field_name: 'ph',
+              //   field_unit: 'pH',
+              //   min : null,
+              //   max : null
+              // },
+              // {
+              //   field_display: 'Humidity',
+              //   field_name: 'humidity',
+              //   field_unit: '%',
+              //   min : null,
+              //   max : null
+              // },
             ],
           }}
           onSubmit={async (values, actions) => {
             actions.setSubmitting(true)
+            console.log(warning)
+            // console.log("value",values)
+            let data :any = values;
             try {
-                           
+             
+              values.warning = warning
+              if(!warning)
+              {
+                delete data.phone_number
+                for(const i in data.data_fields){
+                  // console.log(data.data_fields[i])
+                  delete data.data_fields[i].max
+                  delete data.data_fields[i].min
+                }
+              }
+              
+              console.log(data) 
               const result = await axios({
                 method : "post",
                 url : "http://192.168.0.100:4002/api/user/adddevice",
@@ -579,7 +613,7 @@ const IndexPage = () => {
                 },
                 data : {
                   infoDevice : {
-                    ...values
+                    ...data
                   }
                 }
               })
@@ -600,7 +634,7 @@ const IndexPage = () => {
                   },
                 },
               )
-
+              setWarning(false)
               actions.setSubmitting(false)
               setIsOpen(false)
             } catch (error) {
@@ -624,8 +658,10 @@ const IndexPage = () => {
               )
             }
           }}
-          render={({ handleChange, values, isSubmitting }) => (
-            <Form>
+          
+        >
+          {({ handleChange, values, isSubmitting }) => (
+            <Form >
               <ModalHeader>Thêm thiết bị</ModalHeader>
               <ModalBody>
                 <FormControl label="Tên thiết bị *">
@@ -646,14 +682,25 @@ const IndexPage = () => {
                     }}
                   />
                 </FormControl>
-                {/* <FormControl label="ID thiết bị *">
+                <FormControl>
+                <Checkbox
+                  name="warning"
+                  checked={warning}
+                  onChange={(e:any)=>{setWarning(e.target.checked)}}
+                  labelPlacement={LABEL_PLACEMENT.right}
+                >
+                  Canh Bao
+                </Checkbox>
+                </FormControl>
+                {
+                  warning === true && (
+                <FormControl label="Số điện thoại">
                   <Input
                     required
-                    disabled
-                    name="deviceID"
+                    name="phone_number"
                     type="text"
                     onChange={handleChange}
-                    value={values.deviceID}
+                    value={values.phone_number}
                     overrides={{
                       InputContainer: {
                         style: {
@@ -663,7 +710,9 @@ const IndexPage = () => {
                       },
                     }}
                   />
-                </FormControl> */}
+                </FormControl>) 
+                }
+                
                 {/* <FormControl
                   label="Khóa riêng tư Sawtooth *"
                   caption="TODO: Help"
@@ -785,7 +834,7 @@ const IndexPage = () => {
                               <Block flex="1" marginRight="scale400">
                                 <FormControl label="Đơn vị">
                                   <Input
-                                    //required
+                                    required
                                     name={`data_fields.${i}.field_unit`}
                                     type="text"
                                     onChange={handleChange}
@@ -804,6 +853,52 @@ const IndexPage = () => {
                                   />
                                 </FormControl>
                               </Block>
+                              {warning === true && (
+                              <Block flex="1" marginRight="scale400">
+                                <FormControl label="Giá trị min">
+                                  <Input
+                                    required
+                                    name={`data_fields.${i}.min`}
+                                    type="text"
+                                    onChange={handleChange}
+                                    placeholder="10"
+                                    value={data_field.min || ''}
+                                    overrides={{
+                                      InputContainer: {
+                                        style: {
+                                          borderTopLeftRadius:
+                                            theme.sizing.scale400,
+                                          borderBottomRightRadius:
+                                            theme.sizing.scale400,
+                                        },
+                                      },
+                                    }}
+                                  />
+                                </FormControl>
+                              </Block>)}
+                              {warning === true &&(
+                              <Block flex="1" marginRight="scale400">
+                                <FormControl label="Giá trị Max">
+                                  <Input
+                                    required
+                                    name={`data_fields.${i}.max`}
+                                    type="text"
+                                    onChange={handleChange}
+                                    placeholder="40"
+                                    value={data_field.max ||''}
+                                    overrides={{
+                                      InputContainer: {
+                                        style: {
+                                          borderTopLeftRadius:
+                                            theme.sizing.scale400,
+                                          borderBottomRightRadius:
+                                            theme.sizing.scale400,
+                                        },
+                                      },
+                                    }}
+                                  />
+                                </FormControl>
+                              </Block>)}
 
                               <Block marginTop="scale500">
                                 <Button
@@ -874,7 +969,7 @@ const IndexPage = () => {
               </ModalFooter>
             </Form>
           )}
-        />
+        </Formik>
       </Modal>
     </div>
     // <div>hihi</div>

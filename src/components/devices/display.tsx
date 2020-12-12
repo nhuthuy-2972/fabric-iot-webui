@@ -11,7 +11,6 @@ import {
   YAxis,
   Tooltip,
   Line,
-  Text,
 } from 'recharts'
 
 // moment().zone(7)

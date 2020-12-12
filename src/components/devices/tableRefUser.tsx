@@ -120,20 +120,20 @@ const CenteredBodyCell = withStyle(StyledBodyCell, ({ $theme }) => ({
               whiteSpace: 'nowrap',
             })}
           >
+            {row.actived === 'yes' ? (
             <Button
-              disabled={row.actived !== 'yes' ? true : false}
               size="compact"
               kind="secondary"
               startEnhancer={() => (
-                <Activity color={theme.colors.mono700} size={15} />
+                <Activity color={theme.colors.warning} size={15} />
               )}
               overrides={{
                 BaseButton: {
                   style: ({ $theme }) => ({
-                    backgroundColor: theme.colors.backgroundTertiary,
+                    backgroundColor: theme.colors.positive,
                     borderBottomRightRadius: theme.sizing.scale200,
                     borderTopLeftRadius: theme.sizing.scale200,
-                    // color : $theme.colors.mono100,
+                    color : $theme.colors.mono100,
                     
                   })
                 }
@@ -144,29 +144,36 @@ const CenteredBodyCell = withStyle(StyledBodyCell, ({ $theme }) => ({
             >
               Xem
             </Button>
-            
-          {
-        (type && type === 'own') && 
-        (
-          <>
-          <span className={space} />
-          <Button
-              disabled={row.actived !== 'yes' ? true : false}
+          ) : (
+            <Button
               size="compact"
-              kind="tertiary"
+              kind="secondary"
+              disabled
+            >
+              Xem
+            </Button>
+          )}
+          {
+              (type && type === 'own') && 
+              (
+                  <>
+                    <span className={space} />
+          <Button
+              size="compact"
+              kind="secondary"
               onClick={() => {
                 router.push(`/devices/sharemanager/${row.deviceID}`)
               }}
               startEnhancer={() => (
-                <Share2 color={theme.colors.mono700} size={15} />
+                <Share2 color={theme.colors.contentNegative} size={15} />
               )}
               overrides={{
                 BaseButton: {
                   style: ({ $theme }) => ({
-                    backgroundColor: theme.colors.backgroundTertiary,
+                    backgroundColor: theme.colors.positive,
                     borderBottomRightRadius: theme.sizing.scale200,
                     borderTopLeftRadius: theme.sizing.scale200,
-                    // color : $theme.colors.mono100,
+                    color : $theme.colors.mono100,
                   })
                 }
               }}

@@ -1,30 +1,30 @@
 Arguments: 
-  /home/nhuthuy/.nvm/versions/node/v14.15.1/bin/node /usr/share/yarn/bin/yarn.js add @typereact-scroll
+  /home/nhuthuy/.nvm/versions/node/v12.14.1/bin/node /usr/share/yarn/bin/yarn.js add @type/yup
 
 PATH: 
-  /home/nhuthuy/Android/Sdk/platform-tools:/home/nhuthuy/Android/Sdk/emulator:/home/nhuthuy/Android/Sdk/tools:/home/nhuthuy/Android/Sdk/platform-tools:/home/nhuthuy/Android/Sdk/emulator:/home/nhuthuy/Android/Sdk/tools:/home/nhuthuy/.nvm/versions/node/v14.15.1/bin:/home/nhuthuy/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/home/nhuthuy/nhuthuy/.chrome-driver:/home/nhuthuy/nhuthuy/.chrome-driver
+  /home/nhuthuy/Android/Sdk/platform-tools:/home/nhuthuy/Android/Sdk/emulator:/home/nhuthuy/Android/Sdk/tools:/home/nhuthuy/Android/Sdk/platform-tools:/home/nhuthuy/Android/Sdk/emulator:/home/nhuthuy/Android/Sdk/tools:/home/nhuthuy/.nvm/versions/node/v12.14.1/bin:/home/nhuthuy/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/home/nhuthuy/nhuthuy/.chrome-driver:/home/nhuthuy/nhuthuy/.chrome-driver
 
 Yarn version: 
   1.22.5
 
 Node version: 
-  14.15.1
+  12.14.1
 
 Platform: 
   linux x64
 
 Trace: 
-  Error: https://registry.yarnpkg.com/@typereact-scroll: Request "https://registry.yarnpkg.com/@typereact-scroll" returned a 405
-      at Request.params.callback [as _callback] (/usr/share/yarn/lib/cli.js:66997:18)
+  Error: https://registry.yarnpkg.com/@type%2fyup: Not found
+      at Request.params.callback [as _callback] (/usr/share/yarn/lib/cli.js:66988:18)
       at Request.self.callback (/usr/share/yarn/lib/cli.js:140749:22)
-      at Request.emit (events.js:315:20)
+      at Request.emit (events.js:223:5)
       at Request.<anonymous> (/usr/share/yarn/lib/cli.js:141721:10)
-      at Request.emit (events.js:315:20)
+      at Request.emit (events.js:223:5)
       at IncomingMessage.<anonymous> (/usr/share/yarn/lib/cli.js:141643:12)
-      at Object.onceWrapper (events.js:421:28)
-      at IncomingMessage.emit (events.js:327:22)
-      at endReadableNT (_stream_readable.js:1327:12)
-      at processTicksAndRejections (internal/process/task_queues.js:80:21)
+      at Object.onceWrapper (events.js:312:28)
+      at IncomingMessage.emit (events.js:228:7)
+      at endReadableNT (_stream_readable.js:1185:12)
+      at processTicksAndRejections (internal/process/task_queues.js:81:21)
 
 npm manifest: 
   {
@@ -41,6 +41,7 @@ npm manifest:
       "@types/node": "^12.0.0",
       "@types/react": "^16.9.0",
       "@types/react-dom": "^16.9.0",
+      "@types/react-scroll": "^1.8.2",
       "axios": "^0.19.2",
       "axios-auth-refresh": "^3.0.0",
       "baseui": "^9.60.0",
@@ -2051,6 +2052,13 @@ Lockfile:
     integrity sha512-PZtnBuyfL07sqCJvGg3z+0+kt6fobc/xmle08jBiezLS8FrmGeiGkJnuxL/8Zgy9L83ypUhniV5atZn/L8n9MQ==
     dependencies:
       "@types/history" "*"
+      "@types/react" "*"
+  
+  "@types/react-scroll@^1.8.2":
+    version "1.8.2"
+    resolved "https://registry.yarnpkg.com/@types/react-scroll/-/react-scroll-1.8.2.tgz#44bbbadabb9014517eb865d6fa47937535a2234a"
+    integrity sha512-oavV6BZLfaIghX4JSmrm6mJkeVayQlmsFx1Rz8ffGjMngHAI/juZkRZM/zV/H5D0pGqjzACvBmKYUU4YBecwLg==
+    dependencies:
       "@types/react" "*"
   
   "@types/react-text-mask@^5.4.3":

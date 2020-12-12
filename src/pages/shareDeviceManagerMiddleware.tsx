@@ -1,47 +1,16 @@
-// import * as React from 'react'
-// import {  useStyletron } from 'baseui'
-// import { Button } from 'baseui/button'
-// import {DevicesTable} from '../../pages/table'
-// import { PlusCircle, Plus, X, RotateCcw, Search } from 'react-feather'
-// import {
-//   Modal,
-//   ModalFooter,
-//   ModalButton,
-//   ModalHeader,
-//   ModalBody,
-// } from 'baseui/modal'
-
-// import { toaster } from 'baseui/toast'
-// import { db } from '../../hooks/use-auth'
-// import { useAuth } from '../../hooks/use-auth'
-// import { useHistory,useParams } from 'react-router-dom'
-// import axios from 'axios'
-
-// export const ShareDeviceManager = ()=>{
-//     const [refUSer ,setRefUser] = React.useState([])
-//     const { id }: any = useParams()
-
-
-//     React.useEffect(()=>{
-//         const unsubcrible = db.collection('device').doc(id)
-//     })
-//     return (<div>Share device manager</div>)
-// }
-
-
 import * as React from 'react'
 import { useParams, useHistory } from 'react-router-dom'
 import { useStyletron } from 'baseui'
 import { toaster } from 'baseui/toast'
-import { db, fbase, useAuth } from '../../hooks/use-auth'
+import { db, useAuth } from '../hooks/use-auth'
+import {ShareDeviceManager} from '../components/devices/sharemanager'
 import dotenv from 'dotenv'
 dotenv.config()
-export const ShareDeviceManager = () => {
+const ManagerMidleWare = () => {
   const [css, theme] = useStyletron()
   const { id }: any = useParams()
   const {state} :any = useAuth()
   const router = useHistory()
-  const [refUSer ,setRefUser] = React.useState([])
 
   React.useEffect(() => {
     const getdata = async () => {
@@ -51,8 +20,6 @@ export const ShareDeviceManager = () => {
         .then((doc: any) => {
           if (doc.exists && doc.data().auth === state.user.uid) {
             console.log('yes!')
-            const getuserRef = doc.data().refUser
-            console.log(getuserRef)
           } else {
             toaster.warning('Không có quyền truy cập!!!', {
               autoHideDuration: 5000,
@@ -70,7 +37,7 @@ export const ShareDeviceManager = () => {
         })
     }
     getdata()
-  }, [id,router,state.user.uid])
+  }, [id,router])
 
 
   return (
@@ -81,7 +48,10 @@ export const ShareDeviceManager = () => {
         margin: `${theme.sizing.scale600} auto`,
       })}
     >
-        Device Manager
+        <ShareDeviceManager></ShareDeviceManager>
+      {/* <StreamDevices info={infoDevice}></StreamDevices> */}
     </div>
   )
 }
+
+export default ManagerMidleWare

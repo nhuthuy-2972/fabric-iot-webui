@@ -1,23 +1,20 @@
 import * as React from 'react'
-import { useParams, Route, useHistory } from 'react-router-dom'
+import { useParams, useHistory } from 'react-router-dom'
 import StreamDevices from '../components/devices/stream'
 import { useStyletron } from 'baseui'
 import { toaster } from 'baseui/toast'
-import { fbase, useAuth } from '../hooks/use-auth'
+import {  useAuth } from '../hooks/use-auth'
 import { db } from '../hooks/use-auth'
 import dotenv from 'dotenv'
 import axios from 'axios'
 dotenv.config()
 const DevicesPage = () => {
   const [css, theme] = useStyletron()
-  const { typeDevice, id }: any = useParams()
-  // const par: any = useParams()
-  // console.log('prarams', par)
-  // console.log('params ne : ', typeDevice, id)
+  const { id }: any = useParams()
+ 
   const { state }: any = useAuth()
   console.log('state ne :', state)
-  // const [check, setcheck] = React.useState(Boolean)
-
+ 
   const [infoDevice, setInfo] = React.useState({})
   const router = useHistory()
 
@@ -95,7 +92,7 @@ const DevicesPage = () => {
         })
     }
     getdata()
-  }, [])
+  }, [id,router,state.customClaims.token,state.user.uid])
 
   // console.log(state.customClaims.token)
 
