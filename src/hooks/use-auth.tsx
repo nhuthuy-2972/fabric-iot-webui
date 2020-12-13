@@ -5,17 +5,16 @@ import 'firebase/firestore'
 import { toaster } from 'baseui/toast'
 if (!firebase.apps.length) {
   firebase.initializeApp({
-    apiKey: "AIzaSyDUnozcahXIVhLOFxSNsyzmiXUa6sefkTY",
-    authDomain: "iotbaseonfabric.firebaseapp.com",
-    databaseURL: "https://iotbaseonfabric.firebaseio.com",
-    projectId: "iotbaseonfabric",
-    storageBucket: "iotbaseonfabric.appspot.com",
-    messagingSenderId: "1028990275388",
-    appId: "1:1028990275388:web:cbaa82cb7e2df883559839",
-    measurementId: "G-LSLQ1DZ5DB"
+    apiKey: 'AIzaSyDUnozcahXIVhLOFxSNsyzmiXUa6sefkTY',
+    authDomain: 'iotbaseonfabric.firebaseapp.com',
+    databaseURL: 'https://iotbaseonfabric.firebaseio.com',
+    projectId: 'iotbaseonfabric',
+    storageBucket: 'iotbaseonfabric.appspot.com',
+    messagingSenderId: '1028990275388',
+    appId: '1:1028990275388:web:cbaa82cb7e2df883559839',
+    measurementId: 'G-LSLQ1DZ5DB',
   })
 }
-
 
 // if (!firebase.apps.length) {
 //   firebase.initializeApp({
@@ -29,9 +28,6 @@ if (!firebase.apps.length) {
 //     measurementId: "G-EGLBQ622NR"
 //   })
 // }
-
-
-
 
 export const fbase = firebase
 export const db = firebase.firestore()
@@ -56,17 +52,15 @@ function useProvideAuth() {
   })
 
   async function onChange(user: any) {
-
     if (user) {
-      console.log("on change");
+      console.log('on change')
       const tokenResult: any = await firebase
         .auth()
-        .currentUser!.getIdTokenResult();
+        .currentUser!.getIdTokenResult()
 
       setState({ initializing: false, user, customClaims: tokenResult })
-      
     } else {
-      console.log("NO change");
+      console.log('NO change')
       setState({
         ...state,
         initializing: false,
@@ -93,9 +87,10 @@ function useProvideAuth() {
   //   }
   // }
 
-
   const signin = async (email: string, password: string) => {
-    firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION)
+    firebase
+      .auth()
+      .setPersistence(firebase.auth.Auth.Persistence.SESSION)
       .then(async function () {
         // const v = await firebase
         //   .auth()
@@ -105,25 +100,24 @@ function useProvideAuth() {
         //   autoHideDuration: 5000,
         // })
         //return v;
-        let provider = new firebase.auth.GoogleAuthProvider();
-        firebase.auth().useDeviceLanguage();
-        const v = await firebase.auth().signInWithPopup(provider);
+        let provider = new firebase.auth.GoogleAuthProvider()
+        firebase.auth().useDeviceLanguage()
+        const v = await firebase.auth().signInWithPopup(provider)
 
         toaster.positive(`Auth with Google`, {
           autoHideDuration: 5000,
         })
-        return v;
+        return v
       })
       .catch(function (error) {
         toaster.warning(error.message, {
           autoHideDuration: 5000,
         })
-      });
-
+      })
   }
   const signout = () => {
     //history.push('/')
-    sessionStorage.clear();
+    sessionStorage.clear()
     return firebase.auth().signOut()
   }
 
@@ -133,11 +127,9 @@ function useProvideAuth() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-
   return {
     state,
     signin,
-    signout
-
+    signout,
   }
 }

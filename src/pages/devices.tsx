@@ -3,7 +3,7 @@ import { useParams, useHistory } from 'react-router-dom'
 import StreamDevices from '../components/devices/stream'
 import { useStyletron } from 'baseui'
 import { toaster } from 'baseui/toast'
-import {  useAuth } from '../hooks/use-auth'
+import { useAuth } from '../hooks/use-auth'
 import { db } from '../hooks/use-auth'
 import dotenv from 'dotenv'
 import axios from 'axios'
@@ -11,10 +11,10 @@ dotenv.config()
 const DevicesPage = () => {
   const [css, theme] = useStyletron()
   const { id }: any = useParams()
- 
+
   const { state }: any = useAuth()
   console.log('state ne :', state)
- 
+
   const [infoDevice, setInfo] = React.useState({})
   const router = useHistory()
 
@@ -79,7 +79,6 @@ const DevicesPage = () => {
               autoHideDuration: 5000,
             })
             router.replace(`/`)
-
           }
         })
         .catch((err) => {
@@ -92,7 +91,7 @@ const DevicesPage = () => {
         })
     }
     getdata()
-  }, [id,router,state.customClaims.token,state.user.uid])
+  }, [id, router, state.customClaims.token, state.user.uid])
 
   // console.log(state.customClaims.token)
 

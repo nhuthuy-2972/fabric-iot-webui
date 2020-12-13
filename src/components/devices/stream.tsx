@@ -3,9 +3,8 @@ import { DeepstreamClient } from '@deepstream/client'
 import { useStyletron } from 'baseui'
 // import { Button } from 'baseui/button'
 // import moment from 'moment'
-
 import axios from 'axios'
-import { useParams } from 'react-router-dom'
+import { useParams,useLocation } from 'react-router-dom'
 import { db, useAuth } from '../../hooks/use-auth'
 import Display from './display'
 // // import { Settings } from 'react-feather';
@@ -22,18 +21,22 @@ import createAuthRefreshInterceptor from 'axios-auth-refresh'
 
 // moment().zone(7)
 
-
 const StreamDevices = ({ info }: any) => {
   const [css, theme] = useStyletron()
   const [data, setData]: any = React.useState(Object)
   const { typeDevice, id }: any = useParams()
   const [history, sethistory] = React.useState(Object)
   const [fields, setfields] = React.useState(Array)
-
+  const Location = useLocation()
   const [device, setdevice] = React.useState(Object)
   const [isOpen, setOpen] = React.useState(false)
   const { state }: any = useAuth()
+  console.log("state",Location.state)
+  const State :any= Location.state!
+  // Location.
   React.useEffect(() => {
+    setfields(State.device.data_fields)
+  setdevice({ name: State.device.name, desc: State.device.desc })
     const client = new DeepstreamClient('localhost:6020')
     client.login()
     const record = client.record.getRecord('news')
@@ -43,7 +46,6 @@ const StreamDevices = ({ info }: any) => {
           method: 'post',
           url: 'http://localhost:4002/api/user/gettoken',
           data: {},
-
         }).then((tokenRefreshResponse: any) => {
           // localStorage.setItem('token', tokenRefreshResponse.data.token);
           console.log('token respone', tokenRefreshResponse)
@@ -125,33 +127,32 @@ const StreamDevices = ({ info }: any) => {
     return () => {
       record.unsubscribe(`news/${id}`, () => console.log('offline'))
     }
-  }, [id])
+  }, [id,State])
 
-  React.useEffect(() => {
-    console.log('set fields')
-    const getdata = async () => {
-      let docs = db.collection('device').doc(id)
+  // React.useEffect(() => {
+  //   console.log('set fields')
+  //   const getdata = async () => {
+  //     let docs = db.collection('device').doc(id)
 
-      await docs
-        .get()
-        .then(async (doc) => {
-          if (!doc.exists) {
-            console.log('No such document!')
-          } else {
-
-            let field = doc.get('data_fields')
-            // setPrivate_key(doc.get('privateKey'))
-            // setToken(doc.get('token'))
-            setfields(field)
-            setdevice({ name: doc.get('name'), desc: doc.get('desc') })
-          }
-        })
-        .catch((err) => {
-          console.log('Error getting document', err)
-        })
-    }
-    getdata()
-  }, [id])
+  //     await docs
+  //       .get()
+  //       .then(async (doc) => {
+  //         if (!doc.exists) {
+  //           console.log('No such document!')
+  //         } else {
+  //           let field = doc.get('data_fields')
+  //           // setPrivate_key(doc.get('privateKey'))
+  //           // setToken(doc.get('token'))
+  //           setfields(field)
+  //           setdevice({ name: doc.get('name'), desc: doc.get('desc') })
+  //         }
+  //       })
+  //       .catch((err) => {
+  //         console.log('Error getting document', err)
+  //       })
+  //   }
+  //   getdata()
+  // }, [id])
 
   console.log('info ne', info)
 

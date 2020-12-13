@@ -1,9 +1,9 @@
 import React from 'react'
 import { BrowserRouter, Route, Switch } from 'react-router-dom'
-import { ToasterContainer } from 'baseui/toast'//hien thi thong bao
-import { BaseProvider } from 'baseui'//theme
-import { Client as Styletron } from 'styletron-engine-atomic'//theme
-import { Provider as StyletronProvider } from 'styletron-react'//theme
+import { ToasterContainer } from 'baseui/toast' //hien thi thong bao
+import { BaseProvider } from 'baseui' //theme
+import { Client as Styletron } from 'styletron-engine-atomic' //theme
+import { Provider as StyletronProvider } from 'styletron-react' //theme
 
 import IndexPage from './pages'
 import DevicesPage from './pages/devices'
@@ -11,7 +11,7 @@ import DevicesPage from './pages/devices'
 import { ProvideAuth } from './hooks/use-auth'
 import { Layout } from './components/layout'
 import { Theme } from './shared/theme'
-import {ShareDeviceManager} from './components/devices/sharemanager'
+import { ShareDeviceManager } from './components/devices/sharemanager'
 const engine = new Styletron()
 
 const App: React.FC<{}> = () => {
