@@ -61,6 +61,7 @@ const Row = ({ striped, row, dataf }: any) => {
   const {state}:any = useAuth()
   const [isOpen,setIsOpen] = React.useState(false)
   const [datafieldchoosen , setdatafieldchoosen] = React.useState({data_fields :[{field_name:'',field_display :'',field_unit :'',share : false}],name :''})
+  const [datafieldchoosen1 , setdatafieldchoosen1] = React.useState({data_fields :[{field_name:'',field_display :'',field_unit :'',share : false}],name :''})
   // const [datafieldchoosen , setdatafieldchoosen] = React.useState('')
 
   const [datafields,setdatafields] = React.useState({data_fields :[{field_name:'',field_display :'',field_unit :''}],name :''})
@@ -72,17 +73,18 @@ const Row = ({ striped, row, dataf }: any) => {
       if(snapshot.size > 0)
       {
         snapshot.forEach((doc:any)=>{
-        console.log(doc.data())
+        // console.log(doc.data())
         // const fieldName = doc.data().data_fields.map((e:any)=>e.field_display)
         // console.log(JSON.stringify(fieldName))
         // const stringname = JSON.stringify(fieldName)
         // setdatafieldchoosen(doc.data())
         setdatafieldchoosen(doc.data())
+        setdatafieldchoosen1(doc.data())
         })
       }
     })
   },[id,row.uid])
-  console.log("data",dataf)
+  // console.log("data",dataf)
   return (
     <>
       <CenteredBodyCellLeft $striped={striped}>
@@ -222,7 +224,7 @@ const Row = ({ striped, row, dataf }: any) => {
           initialValues={{
             deviceID: id,
             email : row.email,
-            data_fields_checked : datafieldchoosen.data_fields,
+            // data_fields_checked : datafieldchoosen.data_fields as any,
             data_fields: [
               ...datafieldchoosen.data_fields
               // {
@@ -248,26 +250,26 @@ const Row = ({ striped, row, dataf }: any) => {
             let data: any = values
             try {
               console.log(data)
-              for (const i in data.data_fields) {
-              // console.log(data.data_fields[i])
-              delete data.data_fields[i].max
-              delete data.data_fields[i].min
-              }
-              console.log(data)
+              // for (const i in data.data_fields) {
+              // // console.log(data.data_fields[i])
+              // delete data.data_fields[i].max
+              // delete data.data_fields[i].min
+              // }
+              // console.log(data)
 
-              const result = await axios({
-                method: 'post',
-                url: 'http://192.168.0.100:4002/api/user/updatefieldshare',
-                headers: {
-                  Authorization: 'Bearer ' + state.customClaims.token,
-                },
-                data: {
-                  deviceID : data.deviceID,
-                  email : data.email,
-                  sensors:data.data_fields
-                },
-              })
-              console.log('ket qua them may: ', result.data)
+              // const result = await axios({
+              //   method: 'post',
+              //   url: 'http://192.168.0.100:4002/api/user/updatefieldshare',
+              //   headers: {
+              //     Authorization: 'Bearer ' + state.customClaims.token,
+              //   },
+              //   data: {
+              //     deviceID : data.deviceID,
+              //     email : data.email,
+              //     sensors:data.data_fields
+              //   },
+              // })
+              // console.log('ket qua them may: ', result.data)
               toaster.positive(
                 <div className={css({ ...theme.typography.font200 })}>
                   Thêm thiết bị thành công!
@@ -473,6 +475,7 @@ const Row = ({ striped, row, dataf }: any) => {
                                 
                               </Block> */}
                               <Block marginTop="scale500">
+                              
                                 <StatefulCheckbox
                                     initialState={{checked : data_field.share ? true : false}}
                                     onChange={(e:any) =>{
@@ -480,11 +483,16 @@ const Row = ({ striped, row, dataf }: any) => {
                                     const checked = e.target.checked
                                     if(checked)
                                     {
+                                      // values.data_fields_checked[i].share = true
                                       data_field.share = true
                                     }else{
+                                      // values.data_fields_checked[i].share = false
                                       data_field.share = false
                                     }
-                                    console.log(values.data_fields)
+                                    // console.log("choosen1" ,datafieldchoosen1.data_fields)
+                                    // console.log("chooesen",datafieldchoosen.data_fields)
+                                    console.log("Data",values.data_fields)
+                                    // console.log("checked",values.data_fields_checked)
                                   }}/>
                               </Block>
                             </Block>
@@ -498,6 +506,10 @@ const Row = ({ striped, row, dataf }: any) => {
                 <ModalButton
                   type="button"
                   onClick={() => {
+                    datafieldchoosen1.data_fields.map((dtf,i)=>{
+                      values.data_fields[i].share = dtf.share
+                    })
+                    // values.data_fields_checked = datafieldchoosen.data_fields
                     // setdatafieldchoosen(datafieldchoosen)
                     // values.data_fields=datafieldchoosen.data_fields
                     setIsOpen(false)}}

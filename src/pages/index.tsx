@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useStyletron } from 'baseui'
+import { useStyletron,withStyle } from 'baseui'
 import { Button } from 'baseui/button'
 import { DevicesTable } from './table'
 import { PlusCircle, Plus, X, RotateCcw, Search } from 'react-feather'
@@ -22,6 +22,8 @@ import { FormControl } from 'baseui/form-control'
 import { StyledSpinnerNext } from 'baseui/spinner'
 import { Radio, RadioGroup } from 'baseui/radio'
 import { Checkbox, LABEL_PLACEMENT } from 'baseui/checkbox'
+import { StyledTable, StyledHeadCell, StyledBodyCell } from 'baseui/table-grid'
+
 // import Yup from 'yup';
 const IndexPage = () => {
   const [css, theme] = useStyletron()
@@ -70,6 +72,26 @@ const IndexPage = () => {
   //   phone_number: Yup.string().matches(phoneRegExp,'Sô điện thoại không hợp lệ')
   // });
 
+  const HeadCellLeft = withStyle(StyledHeadCell, ({ $theme }) => ({
+    boxShadow: 'none',
+    backgroundColor: $theme.colors.positive,
+  
+    borderWidth: '0px',
+    color: $theme.colors.mono100,
+  }))
+  
+  const NewStyledTable = withStyle(StyledTable, ({ $theme }) => ({
+    ...$theme.borders.border200,
+    height: 'auto',
+    overflowX: 'auto',
+    backgroundColor: $theme.colors.mono100,
+    borderTopLeftRadius: $theme.sizing.scale400,
+    borderTopRightRadius: $theme.sizing.scale400,
+    borderBottomLeftRadius: $theme.sizing.scale400,
+    borderBottomRightRadius: $theme.sizing.scale400,
+    boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+  }))
+  
   const searchbutton1 = async (e: any, type: String) => {
     // console.log(e)
     e.preventDefault()
@@ -393,6 +415,20 @@ const IndexPage = () => {
       )}
 
       {devices !== 'loading' && devices.length === 0 && (
+       <> <div
+        className={css({
+          marginTop: theme.sizing.scale400,
+          marginBottom: theme.sizing.scale400,
+        })}
+      >
+        <NewStyledTable $gridTemplateColumns="auto auto auto auto auto">
+          <HeadCellLeft $sticky={false}>ID</HeadCellLeft>
+          <HeadCellLeft $sticky={false}>Tên thiết bị</HeadCellLeft>
+          <HeadCellLeft $sticky={false}>Miêu tả</HeadCellLeft>
+          <HeadCellLeft $sticky={false}>Trạng thái</HeadCellLeft>
+          <HeadCellLeft $sticky={false}></HeadCellLeft>
+        </NewStyledTable>
+      </div>
         <div
           className={css({
             display: 'flex',
@@ -402,9 +438,11 @@ const IndexPage = () => {
             marginTop: theme.sizing.scale1000,
           })}
         >
+          
           <img width="300" src="/assets/no-devices.svg" alt="#" />
           <Paragraph2>Không có thiết bị</Paragraph2>
         </div>
+        </>
       )}
 
       {devices !== 'loading' && devices.length > 0 && (
@@ -536,18 +574,34 @@ const IndexPage = () => {
       )}
 
       {linkedDevices !== 'loading' && linkedDevices.length === 0 && (
-        <div
-          className={css({
-            display: 'flex',
-            justifyContent: 'center',
-            flexDirection: 'column',
-            alignItems: 'center',
-            marginTop: theme.sizing.scale1000,
-          })}
-        >
-          <img width="300" src="/assets/no-devices.svg" alt="#" />
-          <Paragraph2>Không có thiết bị linked</Paragraph2>
-        </div>
+       <> <div
+       className={css({
+         marginTop: theme.sizing.scale400,
+         marginBottom: theme.sizing.scale400,
+       })}
+     >
+       <NewStyledTable $gridTemplateColumns="auto auto auto auto auto">
+         <HeadCellLeft $sticky={false}>ID</HeadCellLeft>
+         <HeadCellLeft $sticky={false}>Tên thiết bị</HeadCellLeft>
+         <HeadCellLeft $sticky={false}>Miêu tả</HeadCellLeft>
+         <HeadCellLeft $sticky={false}>Trạng thái</HeadCellLeft>
+         <HeadCellLeft $sticky={false}></HeadCellLeft>
+       </NewStyledTable>
+     </div>
+       <div
+         className={css({
+           display: 'flex',
+           justifyContent: 'center',
+           flexDirection: 'column',
+           alignItems: 'center',
+           marginTop: theme.sizing.scale1000,
+         })}
+       >
+         
+         <img width="300" src="/assets/no-devices.svg" alt="#" />
+         <Paragraph2>Không có thiết bị Linked</Paragraph2>
+       </div>
+       </>
       )}
 
       {linkedDevices !== 'loading' && linkedDevices.length > 0 && (

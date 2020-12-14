@@ -5,6 +5,7 @@ import { Tag } from 'baseui/tag'
 import { Button } from 'baseui/button'
 import { Activity, Share2 } from 'react-feather'
 import { useHistory } from 'react-router-dom'
+import { Theme } from '../shared/theme'
 
 const CenteredBodyCell = withStyle(StyledBodyCell, ({ $theme }) => ({
   display: 'flex',
@@ -22,7 +23,7 @@ const CenteredBodyCellLeft = withStyle(StyledBodyCell, {
 
 const HeadCellLeft = withStyle(StyledHeadCell, ({ $theme }) => ({
   boxShadow: 'none',
-  backgroundColor: '#3530c4',
+  backgroundColor: $theme.colors.positive,
 
   borderWidth: '0px',
   color: $theme.colors.mono100,
