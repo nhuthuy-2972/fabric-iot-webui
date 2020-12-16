@@ -97,7 +97,7 @@ const Row = ({ striped, row, type }: any) => {
           })}
         >
           {row.actived === 'yes' ? (
-            <Tag closeable={false} variant="outlined" kind={'accent'}>
+            <Tag closeable={false} variant="outlined" kind={'positive'}>
               {'Actived yet'}
             </Tag>
           ) : (

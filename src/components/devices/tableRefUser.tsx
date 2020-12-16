@@ -60,30 +60,91 @@ const Row = ({ striped, row, dataf }: any) => {
   const space = css({ marginLeft: theme.sizing.scale300 })
   const {state}:any = useAuth()
   const [isOpen,setIsOpen] = React.useState(false)
-  const [datafieldchoosen , setdatafieldchoosen] = React.useState({data_fields :[{field_name:'',field_display :'',field_unit :'',share : false}],name :''})
-  const [datafieldchoosen1 , setdatafieldchoosen1] = React.useState({data_fields :[{field_name:'',field_display :'',field_unit :'',share : false}],name :''})
+  // const [datafieldchoosen , setdatafieldchoosen] = React.useState({data_fields :[{field_name:'',field_display :'',field_unit :'',share : false}],name :''})
+  const [datafieldchoosen , setdatafieldchoosen] = React.useState([{field_name:'',field_display :'',field_unit :'',share : false}])
+  const [datafieldchoosen1 , setdatafieldchoosen1] = React.useState([{field_name:'',field_display :'',field_unit :'',share : false}])
+
+  // const [datafieldchoosen1 , setdatafieldchoosen1] = React.useState({data_fields :[{field_name:'',field_display :'',field_unit :'',share : false}],name :''})
   // const [datafieldchoosen , setdatafieldchoosen] = React.useState('')
 
   const [datafields,setdatafields] = React.useState({data_fields :[{field_name:'',field_display :'',field_unit :''}],name :''})
   const { id }: any = useParams()
   const router = useHistory()
   React.useEffect(()=>{
-    db.collection('fieldRef').where('auth','==',row.uid).where('deviceID','==',id).get()
+    // db.collection('fieldRef').where('auth','==',row.uid).where('deviceID','==',id).get()
+    // .then((snapshot:any)=>{
+    //   if(snapshot.size > 0)
+    //   {
+    //     snapshot.forEach((doc:any)=>{
+    //     // console.log(doc.data())
+    //     // const fieldName = doc.data().data_fields.map((e:any)=>e.field_display)
+    //     // console.log(JSON.stringify(fieldName))
+    //     // const stringname = JSON.stringify(fieldName)
+    //     // setdatafieldchoosen(doc.data())
+    //     setdatafieldchoosen(doc.data())
+    //     setdatafieldchoosen1(doc.data())
+    //     })
+    //   }
+    // })
+    db.collection('bcAccounts').where('auth','==',row.uid).where('deviceID','==',id).where('provider','==',state.user.uid).get()
     .then((snapshot:any)=>{
       if(snapshot.size > 0)
       {
-        snapshot.forEach((doc:any)=>{
+        snapshot.forEach(async (doc:any)=>{
         // console.log(doc.data())
         // const fieldName = doc.data().data_fields.map((e:any)=>e.field_display)
         // console.log(JSON.stringify(fieldName))
         // const stringname = JSON.stringify(fieldName)
         // setdatafieldchoosen(doc.data())
-        setdatafieldchoosen(doc.data())
-        setdatafieldchoosen1(doc.data())
+        // setdatafieldchoosen(doc.data())
+        // setdatafieldchoosen1(doc.data())
+        const bcIdentity = doc.data().bcIdentity
+        try {
+          const result = await axios({
+            method :'post',
+            headers :{
+              Authorization : "Bearer " + state.customClaims.token
+            },
+           url : 'http://192.168.0.100:4002/api/user/getuserfield',
+           data:{
+             deviceID : id,
+             bcIdentity : bcIdentity
+           }
+          })
+
+          console.log(result.data)
+          setdatafieldchoosen(result.data.data)
+          setdatafieldchoosen1(result.data.data)
+        } catch (error) {
+          // router.replace('/')
+          console.log(error)
+        }
         })
+      }else{
+        toaster.positive(
+          <div className={css({ ...theme.typography.font200 })}>
+            Lỗi!!!
+          </div>,
+          {
+            autoHideDuration: 3000,
+            overrides: {
+              Body: {
+                style: {
+                  borderTopLeftRadius: theme.sizing.scale400,
+                  borderBottomRightRadius: theme.sizing.scale400,
+                },
+              },
+            },
+          },
+        )
+        // setIsOpen(false)
+        router.replace('/')
       }
+    }).catch(err=>{
+      console.log(err)
+      router.replace('/')
     })
-  },[id,row.uid])
+  },[])
   // console.log("data",dataf)
   return (
     <>
@@ -226,7 +287,8 @@ const Row = ({ striped, row, dataf }: any) => {
             email : row.email,
             // data_fields_checked : datafieldchoosen.data_fields as any,
             data_fields: [
-              ...datafieldchoosen.data_fields
+              // ...datafieldchoosen.data_fields
+              ...datafieldchoosen
               // {
               //   field_display :"nhiet do",
               //   field_name :"temperature",
@@ -250,26 +312,26 @@ const Row = ({ striped, row, dataf }: any) => {
             let data: any = values
             try {
               console.log(data)
-              // for (const i in data.data_fields) {
-              // // console.log(data.data_fields[i])
-              // delete data.data_fields[i].max
-              // delete data.data_fields[i].min
-              // }
-              // console.log(data)
+              for (const i in data.data_fields) {
+              // console.log(data.data_fields[i])
+              delete data.data_fields[i].max
+              delete data.data_fields[i].min
+              }
+              console.log(data)
 
-              // const result = await axios({
-              //   method: 'post',
-              //   url: 'http://192.168.0.100:4002/api/user/updatefieldshare',
-              //   headers: {
-              //     Authorization: 'Bearer ' + state.customClaims.token,
-              //   },
-              //   data: {
-              //     deviceID : data.deviceID,
-              //     email : data.email,
-              //     sensors:data.data_fields
-              //   },
-              // })
-              // console.log('ket qua them may: ', result.data)
+              const result = await axios({
+                method: 'post',
+                url: 'http://192.168.0.100:4002/api/user/updatefieldshare',
+                headers: {
+                  Authorization: 'Bearer ' + state.customClaims.token,
+                },
+                data: {
+                  deviceID : data.deviceID,
+                  email : data.email,
+                  sensors:data.data_fields
+                },
+              })
+              console.log('ket qua them may: ', result.data)
               toaster.positive(
                 <div className={css({ ...theme.typography.font200 })}>
                   Thêm thiết bị thành công!
@@ -506,7 +568,7 @@ const Row = ({ striped, row, dataf }: any) => {
                 <ModalButton
                   type="button"
                   onClick={() => {
-                    datafieldchoosen1.data_fields.map((dtf,i)=>{
+                    datafieldchoosen1.map((dtf,i)=>{
                       values.data_fields[i].share = dtf.share
                     })
                     // values.data_fields_checked = datafieldchoosen.data_fields
