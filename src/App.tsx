@@ -7,12 +7,14 @@ import { Provider as StyletronProvider } from 'styletron-react' //theme
 
 import IndexPage from './pages'
 import DevicesPage from './pages/devices'
+import { Statistical } from './components/devices/statistical'
 import DevicesPagaRef from './pages/devicesref'
 // import ManagerMiddleWare from './pages/shareDeviceManagerMiddleware'
 import { ProvideAuth } from './hooks/use-auth'
 import { Layout } from './components/layout'
 import { Theme } from './shared/theme'
 import { ShareDeviceManager } from './components/devices/sharemanager'
+import { DevicesTable } from './pages/table'
 const engine = new Styletron()
 
 const App: React.FC<{}> = () => {
@@ -29,6 +31,14 @@ const App: React.FC<{}> = () => {
                   </Route>
                   <Route exact path="/devices/owner/:id?">
                     <DevicesPage />
+                    {/* <Switch>
+                      <Route exact path="/devices/owner/:id?">
+                        <DevicesPage />
+                      </Route>
+                      <Route exact path="/devices/owner/:id?/statistical">
+                        <Statistical />
+                      </Route>
+                    </Switch> */}
                   </Route>
                   <Route exact path="/devices/refer/:id?">
                     <DevicesPagaRef />

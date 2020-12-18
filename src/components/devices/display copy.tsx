@@ -155,7 +155,6 @@ const Display = ({ field, data, history }: any) => {
               <Line
                 isAnimationActive={false}
                 // animationEasing="linear"
-                animationDuration={2000}
                 type="linear"
                 dataKey={field.field_name}
                 stroke="#ec157a"

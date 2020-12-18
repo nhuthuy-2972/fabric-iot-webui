@@ -1,21 +1,21 @@
 import * as React from 'react'
 import { DeepstreamClient } from '@deepstream/client'
 import { useStyletron } from 'baseui'
-// import { Button } from 'baseui/button'
+import { Button } from 'baseui/button'
 // import moment from 'moment'
 import axios from 'axios'
 import { useParams, useLocation, useHistory } from 'react-router-dom'
 import { db, useAuth } from '../../hooks/use-auth'
 import Display from './display'
-// // import { Settings } from 'react-feather';
-// import {
-//   Modal,
-//   ModalHeader,
-//   ModalBody,
-//   ModalFooter,
-//   ModalButton,
-//   FocusOnce,
-// } from 'baseui/modal'
+import { Settings } from 'react-feather'
+import {
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  ModalButton,
+  FocusOnce,
+} from 'baseui/modal'
 // import { Input, SIZE } from 'baseui/input'
 import createAuthRefreshInterceptor from 'axios-auth-refresh'
 
@@ -23,7 +23,10 @@ import createAuthRefreshInterceptor from 'axios-auth-refresh'
 
 const StreamDevices = ({ bcidentity }: any) => {
   const [css, theme] = useStyletron()
-  const [data, setData]: any = React.useState(Object)
+  const [data, setData]: any = React.useState({
+    data: { timestamp: 0 },
+    history: [],
+  })
   const { id }: any = useParams()
   const [history, sethistory] = React.useState(Object)
   const [fields, setfields] = React.useState(Array)
@@ -32,6 +35,36 @@ const StreamDevices = ({ bcidentity }: any) => {
   const [isOpen, setOpen] = React.useState(false)
   const { state }: any = useAuth()
   console.log('aasfasfsaf', bcidentity)
+
+  const refreshAuthLogic = (failedRequest: any) =>
+    axios({
+      method: 'post',
+      url: 'http://localhost:4002/api/user/gettoken',
+      headers: {
+        Authorization: 'Bearer ' + state.customClaims.token,
+      },
+      data: {
+        // bcIdentity: infodev.bcIdentity,
+        bcIdentity: bcidentity,
+        deviceID: id,
+      },
+    })
+      .then((tokenRefreshResponse: any) => {
+        console.log('token respone', tokenRefreshResponse.data.token)
+        failedRequest.response.config.headers['Authorization'] =
+          'Bearer ' + tokenRefreshResponse.data.token
+        sessionStorage.setItem(
+          state.user.uid + id,
+          tokenRefreshResponse.data.token,
+        )
+        return Promise.resolve()
+      })
+      .catch((err) => {
+        console.log(err.message)
+      })
+
+  createAuthRefreshInterceptor(axios, refreshAuthLogic)
+
   React.useEffect(() => {
     console.log('set fields')
     const getdata = async () => {
@@ -60,23 +93,32 @@ const StreamDevices = ({ bcidentity }: any) => {
     client.login()
     const record = client.record.getRecord('news')
     function getds() {
-      const refreshAuthToken = (failedRequest: any) => {
+      record.subscribe(`news/${id}`, async (value: any) => {
+        // await setData(value)
+        console.log('valuene ', value)
         axios({
           method: 'post',
-          url: 'http://localhost:4002/api/user/gettoken',
-          data: {},
-        }).then((tokenRefreshResponse: any) => {
-          // localStorage.setItem('token', tokenRefreshResponse.data.token);
-          console.log('token respone', tokenRefreshResponse)
-          failedRequest.response.config.headers['Authorization'] =
-            'Bearer ' + tokenRefreshResponse.data.token
-          return Promise.resolve()
+          headers: {
+            Authorization:
+              'Bearer ' + sessionStorage.getItem(state.user.uid + id),
+          },
+          url: 'http://localhost:4002/api/device/datadevice',
         })
-      }
-
-      record.subscribe(`news/${id}`, async (value: any) => {
-        await setData(value)
-        console.log('valuene ', value)
+          .then((res: any) => {
+            console.log(res.data)
+            const data = res.data.map((item: any) => {
+              return {
+                ...item.data,
+                time: new Date(item.data.timestamp * 1000).toLocaleTimeString(),
+              }
+            })
+            console.log(data)
+            setData({ data: value, history: data.reverse() })
+            // sethistory(data.reverse())
+          })
+          .catch((Err) => {
+            console.log(Err)
+          })
       })
     }
     getds()
@@ -101,9 +143,11 @@ const StreamDevices = ({ bcidentity }: any) => {
       >
         <div className={css({ ...theme.typography.font550 })}>
           {`${device.name || 'X iot'} (${device.desc || ''})`} Batery :{' '}
-          {data.batery} %
+          {data.history.slice(-1).pop()
+            ? `${data.history.slice(-1).pop().battery} %`
+            : ''}
         </div>
-        {/* <Button
+        <Button
           onClick={() => setOpen(true)}
           kind="secondary"
           startEnhancer={() => (
@@ -124,23 +168,9 @@ const StreamDevices = ({ bcidentity }: any) => {
           <FocusOnce>
             <ModalHeader>Chi tiết</ModalHeader>
           </FocusOnce>
-          <ModalBody>
-            <div>Private key</div>
-            <Input value={private_key.toString()}
-              disabled
-              size={SIZE.mini}
-            />
-            <div>Token</div>
-            <Input
-              value={token.toString()}
-              disabled
-              size={SIZE.mini}
-            />
-
-          </ModalBody>
-          <ModalFooter>
-          </ModalFooter>
-        </Modal> */}
+          <ModalBody></ModalBody>
+          <ModalFooter></ModalFooter>
+        </Modal>
       </div>
 
       <div
@@ -156,8 +186,8 @@ const StreamDevices = ({ bcidentity }: any) => {
             <Display
               key={Math.random() * 10 + i}
               field={ite}
-              data={data}
-              history={history}
+              data={data.data}
+              history={data.history}
             ></Display>
           )
         })}

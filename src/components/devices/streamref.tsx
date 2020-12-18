@@ -26,6 +26,10 @@ import { rejects } from 'assert'
 const StreamDevicesRef = ({ bcidentity }: any) => {
   const [css, theme] = useStyletron()
   const [data, setData]: any = React.useState(Object)
+  const [data1, setData1]: any = React.useState({
+    data: { timestamp: 0 },
+    history: [],
+  })
   const { id }: any = useParams()
   const [history, sethistory] = React.useState(Object)
   const [fields, setfields] = React.useState(Array)
@@ -71,49 +75,78 @@ const StreamDevicesRef = ({ bcidentity }: any) => {
 
   // Location.
   // const infodevice = info
+  // React.useEffect(() => {
+  //   axios({
+  //     method: 'post',
+  //     headers: {
+  //       Authorization: 'Bearer ' + sessionStorage.getItem(state.user.uid + id),
+  //     },
+  //     url: 'http://localhost:4002/api/device/sensorsinfo',
+  //   })
+  //     .then((result: any) => {
+  //       if (result.data.success === true) {
+  //         setfields(result.data.data.data_fields)
+  //         setdevice(result.data.data.deviceInfo)
+  //       } else {
+  //         console.log('khong co token')
+  //         // router.replace('/')
+  //       }
+  //     })
+  //     .catch((err) => {
+  //       // router.replace('/')
+  //     })
+  // }, [])
+
   React.useEffect(() => {
-    axios({
-      method: 'post',
-      headers: {
-        Authorization: 'Bearer ' + sessionStorage.getItem(state.user.uid + id),
-      },
-      url: 'http://localhost:4002/api/device/sensorsinfo',
-    })
-      .then((result: any) => {
-        if (result.data.success === true) {
-          setfields(result.data.data.data_fields)
-          setdevice(result.data.data.deviceInfo)
-        } else {
-          console.log('khong co token')
-          // router.replace('/')
-        }
-      })
-      .catch((err) => {
-        // router.replace('/')
-      })
+    console.log('set fields')
+    const getdata = async () => {
+      await db
+        .collection('fieldRef')
+        .where('auth', '==', state.user.uid)
+        .where('deviceID', '==', id)
+        .onSnapshot((doc) => {
+          doc.forEach((elem: any) => {
+            console.log(elem.id)
+            setfields(elem.data().data_fields)
+            setdevice({ name: 'asfasf', desc: 'ASfasfas' })
+          })
+        })
+    }
+    getdata()
   }, [])
 
   React.useEffect(() => {
     const client = new DeepstreamClient('localhost:6020')
     client.login()
     const record = client.record.getRecord('news')
-    axios({
-      method: 'post',
-      headers: {
-        Authorization: 'Bearer ' + sessionStorage.getItem(state.user.uid + id),
-      },
-      url: 'http://localhost:4002/api/device/sensorsinfo',
-    })
-      .then((res: any) => {
-        console.log(res.data)
-      })
-      .catch((Err) => {
-        console.log(Err)
-      })
+
     function getds() {
       record.subscribe(`news/${id}`, async (value: any) => {
-        await setData(value)
+        // await setData(value)
         console.log('valuene ', value)
+        axios({
+          method: 'post',
+          headers: {
+            Authorization:
+              'Bearer ' + sessionStorage.getItem(state.user.uid + id),
+          },
+          url: 'http://localhost:4002/api/device/datadevice',
+        })
+          .then((res: any) => {
+            console.log(res.data)
+            const data = res.data.map((item: any) => {
+              return {
+                ...item.data,
+                time: new Date(item.data.timestamp * 1000).toLocaleTimeString(),
+              }
+            })
+            console.log(data)
+            setData1({ data: value, history: data.reverse() })
+            // sethistory(data.reverse())
+          })
+          .catch((Err) => {
+            console.log(Err)
+          })
       })
     }
     getds()
@@ -123,12 +156,12 @@ const StreamDevicesRef = ({ bcidentity }: any) => {
     }
   }, [])
 
-  console.log('co bc identity c', bcIdentity)
+  // console.log('co bc identity c', bcIdentity)
 
-  console.log('info ne', bcidentity)
+  // console.log('info ne', bcidentity)
   //console.log("fields", fields)
-  console.log('name', device)
-  console.log('history', history)
+  // console.log('name', device)
+  // console.log('history', history)
   return (
     <div className={css({})}>
       <div
@@ -140,7 +173,9 @@ const StreamDevicesRef = ({ bcidentity }: any) => {
       >
         <div className={css({ ...theme.typography.font550 })}>
           {`${device.name || 'X iot'} (${device.desc || ''})`} Batery :{' '}
-          {data.batery} %
+          {data1.history.slice(-1).pop()
+            ? `${data1.history.slice(-1).pop().battery} %`
+            : ''}
         </div>
         {/* <Button
           onClick={() => setOpen(true)}
@@ -195,8 +230,8 @@ const StreamDevicesRef = ({ bcidentity }: any) => {
             <Display
               key={Math.random() * 10 + i}
               field={ite}
-              data={data}
-              history={history}
+              data={data1.data}
+              history={data1.history}
             ></Display>
           )
         })}
