@@ -5,7 +5,7 @@ import { Tag } from 'baseui/tag'
 import { Button } from 'baseui/button'
 import { Activity, Share2 } from 'react-feather'
 import { Paragraph2, Label2 } from 'baseui/typography'
-import { useHistory ,useParams} from 'react-router-dom'
+import { useHistory, useParams } from 'react-router-dom'
 import { FormControl } from 'baseui/form-control'
 import { PlusCircle, Plus, X, RotateCcw, Search } from 'react-feather'
 import { FieldArray, Form, Formik } from 'formik'
@@ -20,8 +20,8 @@ import {
   ModalBody,
 } from 'baseui/modal'
 import axios from 'axios'
-import {db,useAuth} from '../../hooks/use-auth'
-import {StatefulCheckbox, Checkbox, LABEL_PLACEMENT } from 'baseui/checkbox'
+import { db, useAuth } from '../../hooks/use-auth'
+import { StatefulCheckbox, Checkbox, LABEL_PLACEMENT } from 'baseui/checkbox'
 const CenteredBodyCell = withStyle(StyledBodyCell, ({ $theme }) => ({
   display: 'flex',
   alignItems: 'center',
@@ -58,72 +58,47 @@ const NewStyledTable = withStyle(StyledTable, ({ $theme }) => ({
 const Row = ({ striped, row, dataf }: any) => {
   const [css, theme] = useStyletron()
   const space = css({ marginLeft: theme.sizing.scale300 })
-  const {state}:any = useAuth()
-  const [isOpen,setIsOpen] = React.useState(false)
+  const { state }: any = useAuth()
+  const [isOpen, setIsOpen] = React.useState(false)
   // const [datafieldchoosen , setdatafieldchoosen] = React.useState({data_fields :[{field_name:'',field_display :'',field_unit :'',share : false}],name :''})
-  const [datafieldchoosen , setdatafieldchoosen] = React.useState([{field_name:'',field_display :'',field_unit :'',share : false}])
-  const [datafieldchoosen1 , setdatafieldchoosen1] = React.useState([{field_name:'',field_display :'',field_unit :'',share : false}])
+  const [datafieldchoosen, setdatafieldchoosen] = React.useState([
+    { field_name: '', field_display: '', field_unit: '', share: false },
+  ])
+  const [datafieldchoosen1, setdatafieldchoosen1] = React.useState([
+    { field_name: '', field_display: '', field_unit: '', share: false },
+  ])
 
   // const [datafieldchoosen1 , setdatafieldchoosen1] = React.useState({data_fields :[{field_name:'',field_display :'',field_unit :'',share : false}],name :''})
   // const [datafieldchoosen , setdatafieldchoosen] = React.useState('')
 
-  const [datafields,setdatafields] = React.useState({data_fields :[{field_name:'',field_display :'',field_unit :''}],name :''})
+  const [datafields, setdatafields] = React.useState({
+    data_fields: [{ field_name: '', field_display: '', field_unit: '' }],
+    name: '',
+  })
   const { id }: any = useParams()
   const router = useHistory()
-  React.useEffect(()=>{
-    // db.collection('fieldRef').where('auth','==',row.uid).where('deviceID','==',id).get()
-    // .then((snapshot:any)=>{
-    //   if(snapshot.size > 0)
-    //   {
-    //     snapshot.forEach((doc:any)=>{
-    //     // console.log(doc.data())
-    //     // const fieldName = doc.data().data_fields.map((e:any)=>e.field_display)
-    //     // console.log(JSON.stringify(fieldName))
-    //     // const stringname = JSON.stringify(fieldName)
-    //     // setdatafieldchoosen(doc.data())
-    //     setdatafieldchoosen(doc.data())
-    //     setdatafieldchoosen1(doc.data())
-    //     })
-    //   }
-    // })
-    db.collection('bcAccounts').where('auth','==',row.uid).where('deviceID','==',id).where('provider','==',state.user.uid).get()
-    .then((snapshot:any)=>{
-      if(snapshot.size > 0)
-      {
-        snapshot.forEach(async (doc:any)=>{
-        // console.log(doc.data())
-        // const fieldName = doc.data().data_fields.map((e:any)=>e.field_display)
-        // console.log(JSON.stringify(fieldName))
-        // const stringname = JSON.stringify(fieldName)
-        // setdatafieldchoosen(doc.data())
-        // setdatafieldchoosen(doc.data())
-        // setdatafieldchoosen1(doc.data())
-        const bcIdentity = doc.data().bcIdentity
-        try {
-          const result = await axios({
-            method :'post',
-            headers :{
-              Authorization : "Bearer " + state.customClaims.token
-            },
-           url : 'http://192.168.0.100:4002/api/user/getuserfield',
-           data:{
-             deviceID : id,
-             bcIdentity : bcIdentity
-           }
-          })
-
-          console.log(result.data)
-          setdatafieldchoosen(result.data.data)
-          setdatafieldchoosen1(result.data.data)
-        } catch (error) {
-          // router.replace('/')
-          console.log(error)
-        }
+  React.useEffect(() => {
+    const getattrs = async () => {
+      try {
+        const result = await axios({
+          method: 'post',
+          headers: {
+            Authorization: 'Bearer ' + state.customClaims.token,
+          },
+          url: 'http://192.168.0.100:4002/api/user/getuserfield',
+          data: {
+            deviceID: id,
+            auth: row.uid,
+          },
         })
-      }else{
-        toaster.positive(
+
+        console.log(result.data)
+        setdatafieldchoosen(result.data.data)
+        setdatafieldchoosen1(result.data.data)
+      } catch (error) {
+        toaster.warning(
           <div className={css({ ...theme.typography.font200 })}>
-            Lỗi!!!
+            Đã có lỗi xãy ra!!
           </div>,
           {
             autoHideDuration: 3000,
@@ -137,14 +112,11 @@ const Row = ({ striped, row, dataf }: any) => {
             },
           },
         )
-        // setIsOpen(false)
         router.replace('/')
       }
-    }).catch(err=>{
-      console.log(err)
-      router.replace('/')
-    })
-  },[])
+    }
+    getattrs()
+  }, [])
   // console.log("data",dataf)
   return (
     <>
@@ -228,7 +200,7 @@ const Row = ({ striped, row, dataf }: any) => {
             size="compact"
             kind="tertiary"
             onClick={() => {
-              console.log("id ne",  id)
+              console.log('id ne', id)
               // db.collection('fieldRef').where('auth','==',row.uid).where('deviceID','==',id).get()
               // .then((snapshot:any)=>{
               //   if(snapshot.size > 0)
@@ -284,11 +256,11 @@ const Row = ({ striped, row, dataf }: any) => {
         <Formik
           initialValues={{
             deviceID: id,
-            email : row.email,
+            email: row.email,
             // data_fields_checked : datafieldchoosen.data_fields as any,
             data_fields: [
               // ...datafieldchoosen.data_fields
-              ...datafieldchoosen
+              ...datafieldchoosen,
               // {
               //   field_display :"nhiet do",
               //   field_name :"temperature",
@@ -303,7 +275,7 @@ const Row = ({ striped, row, dataf }: any) => {
               // }
               // ...dataf.data_fields
               // ...datafieldchoosen.data_fields
-            ]
+            ],
           }}
           onSubmit={async (values, actions) => {
             actions.setSubmitting(true)
@@ -313,9 +285,9 @@ const Row = ({ striped, row, dataf }: any) => {
             try {
               console.log(data)
               for (const i in data.data_fields) {
-              // console.log(data.data_fields[i])
-              delete data.data_fields[i].max
-              delete data.data_fields[i].min
+                // console.log(data.data_fields[i])
+                delete data.data_fields[i].max
+                delete data.data_fields[i].min
               }
               console.log(data)
 
@@ -326,9 +298,9 @@ const Row = ({ striped, row, dataf }: any) => {
                   Authorization: 'Bearer ' + state.customClaims.token,
                 },
                 data: {
-                  deviceID : data.deviceID,
-                  email : data.email,
-                  sensors:data.data_fields
+                  deviceID: data.deviceID,
+                  email: data.email,
+                  sensors: data.data_fields,
                 },
               })
               console.log('ket qua them may: ', result.data)
@@ -397,24 +369,24 @@ const Row = ({ striped, row, dataf }: any) => {
                   />
                 </FormControl>
                 <FormControl label="Email">
-                    <Input
-                      disabled
-                      required
-                      name="email"
-                      type="text"
-                      onChange={handleChange}
-                      value={values.email}
-                      overrides={{
-                        InputContainer: {
-                          style: {
-                            borderTopLeftRadius: theme.sizing.scale400,
-                            borderBottomRightRadius: theme.sizing.scale400,
-                          },
+                  <Input
+                    disabled
+                    required
+                    name="email"
+                    type="text"
+                    onChange={handleChange}
+                    value={values.email}
+                    overrides={{
+                      InputContainer: {
+                        style: {
+                          borderTopLeftRadius: theme.sizing.scale400,
+                          borderBottomRightRadius: theme.sizing.scale400,
                         },
-                      }}
-                    />
-                  </FormControl>
-                  {/* <FormControl label="Trường đã chia sẽ">
+                      },
+                    }}
+                  />
+                </FormControl>
+                {/* <FormControl label="Trường đã chia sẽ">
                     <Input
                       disabled
                       required
@@ -537,25 +509,26 @@ const Row = ({ striped, row, dataf }: any) => {
                                 
                               </Block> */}
                               <Block marginTop="scale500">
-                              
                                 <StatefulCheckbox
-                                    initialState={{checked : data_field.share ? true : false}}
-                                    onChange={(e:any) =>{
+                                  initialState={{
+                                    checked: data_field.share ? true : false,
+                                  }}
+                                  onChange={(e: any) => {
                                     console.log(e.target.checked)
                                     const checked = e.target.checked
-                                    if(checked)
-                                    {
+                                    if (checked) {
                                       // values.data_fields_checked[i].share = true
                                       data_field.share = true
-                                    }else{
+                                    } else {
                                       // values.data_fields_checked[i].share = false
                                       data_field.share = false
                                     }
                                     // console.log("choosen1" ,datafieldchoosen1.data_fields)
                                     // console.log("chooesen",datafieldchoosen.data_fields)
-                                    console.log("Data",values.data_fields)
+                                    console.log('Data', values.data_fields)
                                     // console.log("checked",values.data_fields_checked)
-                                  }}/>
+                                  }}
+                                />
                               </Block>
                             </Block>
                           </div>
@@ -568,13 +541,14 @@ const Row = ({ striped, row, dataf }: any) => {
                 <ModalButton
                   type="button"
                   onClick={() => {
-                    datafieldchoosen1.map((dtf,i)=>{
+                    datafieldchoosen1.map((dtf, i) => {
                       values.data_fields[i].share = dtf.share
                     })
                     // values.data_fields_checked = datafieldchoosen.data_fields
                     // setdatafieldchoosen(datafieldchoosen)
                     // values.data_fields=datafieldchoosen.data_fields
-                    setIsOpen(false)}}
+                    setIsOpen(false)
+                  }}
                   kind="tertiary"
                   overrides={{
                     BaseButton: {
@@ -624,7 +598,7 @@ const Row = ({ striped, row, dataf }: any) => {
   )
 }
 
-export const UsersTable = ({ users,dataf }: any) => {
+export const UsersTable = ({ users, dataf }: any) => {
   const [css, theme] = useStyletron()
   return (
     <div
@@ -638,7 +612,7 @@ export const UsersTable = ({ users,dataf }: any) => {
         <HeadCellLeft $sticky={false}>Email</HeadCellLeft>
         <HeadCellLeft $sticky={false}>Số điện thoại</HeadCellLeft>
         <HeadCellLeft $sticky={false}></HeadCellLeft>
-        {users!.map((row: any, index: any ) => {
+        {users!.map((row: any, index: any) => {
           const striped = (index + 1) % 2 === 0
           return <Row key={index} row={row} dataf={dataf} striped={striped} />
         })}
@@ -646,5 +620,3 @@ export const UsersTable = ({ users,dataf }: any) => {
     </div>
   )
 }
-
-

@@ -4,7 +4,7 @@ import { useStyletron } from 'baseui'
 // import { Button } from 'baseui/button'
 // import moment from 'moment'
 import axios from 'axios'
-import { useParams, useLocation, useHistory } from 'react-router-dom'
+import { useParams, useHistory } from 'react-router-dom'
 import { db, useAuth } from '../../hooks/use-auth'
 import Display from './display'
 // // import { Settings } from 'react-feather';
@@ -18,62 +18,99 @@ import Display from './display'
 // } from 'baseui/modal'
 // import { Input, SIZE } from 'baseui/input'
 import createAuthRefreshInterceptor from 'axios-auth-refresh'
+import { resolve } from 'dns'
+import { rejects } from 'assert'
 
 // moment().zone(7)
 
-const StreamDevices = ({ bcidentity }: any) => {
+const StreamDevicesRef = ({ bcidentity }: any) => {
   const [css, theme] = useStyletron()
   const [data, setData]: any = React.useState(Object)
   const { id }: any = useParams()
   const [history, sethistory] = React.useState(Object)
   const [fields, setfields] = React.useState(Array)
   const router = useHistory()
+  const [bcIdentity, setbcIdentity] = React.useState('')
   const [device, setdevice] = React.useState(Object)
   const [isOpen, setOpen] = React.useState(false)
   const { state }: any = useAuth()
-  console.log('aasfasfsaf', bcidentity)
-  React.useEffect(() => {
-    console.log('set fields')
-    const getdata = async () => {
-      let docs = db.collection('device').doc(id)
+  console.log('identity hihihhihi', bcidentity)
+  // axios.interceptors.request.use((request) => {
+  //   request.headers['Authorization'] =
+  //     `Bearer ` + sessionStorage.getItem(state.user.uid + id)
+  //   return request
+  // })
+  const refreshAuthLogic = (failedRequest: any) =>
+    axios({
+      method: 'post',
+      url: 'http://localhost:4002/api/user/gettoken',
+      headers: {
+        Authorization: 'Bearer ' + state.customClaims.token,
+      },
+      data: {
+        // bcIdentity: infodev.bcIdentity,
+        bcIdentity: bcidentity,
+        deviceID: id,
+      },
+    })
+      .then((tokenRefreshResponse: any) => {
+        console.log('token respone', tokenRefreshResponse.data.token)
+        failedRequest.response.config.headers['Authorization'] =
+          'Bearer ' + tokenRefreshResponse.data.token
+        sessionStorage.setItem(
+          state.user.uid + id,
+          tokenRefreshResponse.data.token,
+        )
+        return Promise.resolve()
+      })
+      .catch((err) => {
+        console.log(err.message)
+      })
 
-      await docs
-        .get()
-        .then(async (doc: any) => {
-          if (doc.exists && doc.data().auth === state.user.uid) {
-            let field = doc.get('data_fields')
-            setfields(field)
-            setdevice({ name: doc.get('name'), desc: doc.get('desc') })
-          } else {
-            console.log('No such document!')
-          }
-        })
-        .catch((err) => {
-          console.log('Error getting document', err)
-        })
-    }
-    getdata()
+  createAuthRefreshInterceptor(axios, refreshAuthLogic)
+
+  // Location.
+  // const infodevice = info
+  React.useEffect(() => {
+    axios({
+      method: 'post',
+      headers: {
+        Authorization: 'Bearer ' + sessionStorage.getItem(state.user.uid + id),
+      },
+      url: 'http://localhost:4002/api/device/sensorsinfo',
+    })
+      .then((result: any) => {
+        if (result.data.success === true) {
+          setfields(result.data.data.data_fields)
+          setdevice(result.data.data.deviceInfo)
+        } else {
+          console.log('khong co token')
+          // router.replace('/')
+        }
+      })
+      .catch((err) => {
+        // router.replace('/')
+      })
   }, [])
 
   React.useEffect(() => {
     const client = new DeepstreamClient('localhost:6020')
     client.login()
     const record = client.record.getRecord('news')
+    axios({
+      method: 'post',
+      headers: {
+        Authorization: 'Bearer ' + sessionStorage.getItem(state.user.uid + id),
+      },
+      url: 'http://localhost:4002/api/device/sensorsinfo',
+    })
+      .then((res: any) => {
+        console.log(res.data)
+      })
+      .catch((Err) => {
+        console.log(Err)
+      })
     function getds() {
-      const refreshAuthToken = (failedRequest: any) => {
-        axios({
-          method: 'post',
-          url: 'http://localhost:4002/api/user/gettoken',
-          data: {},
-        }).then((tokenRefreshResponse: any) => {
-          // localStorage.setItem('token', tokenRefreshResponse.data.token);
-          console.log('token respone', tokenRefreshResponse)
-          failedRequest.response.config.headers['Authorization'] =
-            'Bearer ' + tokenRefreshResponse.data.token
-          return Promise.resolve()
-        })
-      }
-
       record.subscribe(`news/${id}`, async (value: any) => {
         await setData(value)
         console.log('valuene ', value)
@@ -85,6 +122,8 @@ const StreamDevices = ({ bcidentity }: any) => {
       record.unsubscribe(`news/${id}`, () => console.log('offline'))
     }
   }, [])
+
+  console.log('co bc identity c', bcIdentity)
 
   console.log('info ne', bcidentity)
   //console.log("fields", fields)
@@ -166,4 +205,4 @@ const StreamDevices = ({ bcidentity }: any) => {
   )
 }
 
-export default StreamDevices
+export default StreamDevicesRef

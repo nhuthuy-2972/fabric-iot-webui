@@ -137,7 +137,13 @@ const Row = ({ striped, row, type }: any) => {
               },
             }}
             onClick={() => {
-              router.replace(`/devices/display/${row.deviceID}`,{device : row})
+              const path =
+                type === 'own'
+                  ? `/devices/owner/${row.deviceID}`
+                  : `/devices/refer/${row.deviceID}`
+              router.replace(path, {
+                device: { name: row.name },
+              })
             }}
           >
             Xem
@@ -151,7 +157,9 @@ const Row = ({ striped, row, type }: any) => {
                 size="compact"
                 kind="tertiary"
                 onClick={() => {
-                  router.replace(`/devices/sharemanager/${row.deviceID}`,{device : row})
+                  router.replace(`/devices/sharemanager/${row.deviceID}`, {
+                    device: row,
+                  })
                 }}
                 startEnhancer={() => (
                   <Share2 color={theme.colors.mono700} size={15} />
