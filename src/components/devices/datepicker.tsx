@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { isAfter, isBefore } from 'date-fns'
 import { Button } from 'baseui/button'
-import { Settings, BarChart2, BatteryCharging } from 'react-feather'
 import { useStyletron } from 'baseui'
 import { FormControl } from 'baseui/form-control'
 import { ArrowRight } from 'baseui/icon'

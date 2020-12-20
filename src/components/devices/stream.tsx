@@ -28,7 +28,7 @@ const StreamDevices = ({ bcidentity }: any) => {
     history: [],
   })
   const { id }: any = useParams()
-  const [history, sethistory] = React.useState(Object)
+  const [history, sethistory] = React.useState(Array)
   const [fields, setfields] = React.useState(Array)
   const router = useHistory()
   const [device, setdevice] = React.useState(Object)
@@ -115,6 +115,7 @@ const StreamDevices = ({ bcidentity }: any) => {
               }
             })
             console.log(data)
+
             setData({ data: value, history: data.reverse() })
             // sethistory(data.reverse())
           })

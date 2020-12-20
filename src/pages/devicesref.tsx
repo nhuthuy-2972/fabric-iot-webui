@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useParams, useHistory } from 'react-router-dom'
+import { useParams, useHistory, Switch, Route } from 'react-router-dom'
 import StreamDevicesRef from '../components/devices/streamref'
 import { StyledSpinnerNext } from 'baseui/spinner'
 
@@ -9,6 +9,7 @@ import { useAuth } from '../hooks/use-auth'
 import { db } from '../hooks/use-auth'
 import dotenv from 'dotenv'
 import axios from 'axios'
+import { Statistical } from '../components/devices/statisticalRef'
 dotenv.config()
 const DevicesPageRef = () => {
   const [css, theme] = useStyletron()
@@ -89,36 +90,94 @@ const DevicesPageRef = () => {
   }, [])
 
   return (
-    <div
-      className={css({
-        maxWidth: '999px',
-        padding: theme.sizing.scale400,
-        margin: `${theme.sizing.scale600} auto`,
-      })}
-    >
-      {bcIdenity !== '' && deviceInfo !== '' && isTrue === true ? (
-        <StreamDevicesRef
-          bcidentity={bcIdenity}
-          deviceinfo={deviceInfo}
-        ></StreamDevicesRef>
-      ) : (
-        <>
-          <div
-            className={css({
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              height: '30vh',
-            })}
-          >
-            <StyledSpinnerNext />
-          </div>
-        </>
-      )}
-
-      {/* {check == true ? <StreamDevices info={infoDevice}></StreamDevices> : React.Fragment} */}
-    </div>
+    <Switch>
+      <Route exact path="/devices/refer/:id?">
+        <div
+          className={css({
+            maxWidth: '999px',
+            padding: theme.sizing.scale400,
+            margin: `${theme.sizing.scale600} auto`,
+          })}
+        >
+          {bcIdenity !== '' && deviceInfo !== '' && isTrue === true ? (
+            <StreamDevicesRef
+              bcidentity={bcIdenity}
+              deviceinfo={deviceInfo}
+            ></StreamDevicesRef>
+          ) : (
+            <>
+              <div
+                className={css({
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  height: '30vh',
+                })}
+              >
+                <StyledSpinnerNext />
+              </div>
+            </>
+          )}
+        </div>
+      </Route>
+      <Route exact path="/devices/refer/:id?/statistical">
+        <div
+          className={css({
+            maxWidth: '999px',
+            padding: theme.sizing.scale400,
+            margin: `${theme.sizing.scale600} auto`,
+          })}
+        >
+          {bcIdenity !== '' && deviceInfo !== '' && isTrue === true ? (
+            <Statistical bcidentity={bcIdenity}></Statistical>
+          ) : (
+            <>
+              <div
+                className={css({
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  height: '30vh',
+                })}
+              >
+                <StyledSpinnerNext />
+              </div>
+            </>
+          )}
+        </div>
+      </Route>
+    </Switch>
   )
 }
 
 export default DevicesPageRef
+{
+  /* <div
+className={css({
+  maxWidth: '999px',
+  padding: theme.sizing.scale400,
+  margin: `${theme.sizing.scale600} auto`,
+})}
+>
+{bcIdenity !== '' && deviceInfo !== '' && isTrue === true ? (
+  <StreamDevicesRef
+    bcidentity={bcIdenity}
+    deviceinfo={deviceInfo}
+  ></StreamDevicesRef>
+) : (
+  <>
+    <div
+      className={css({
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '30vh',
+      })}
+    >
+      <StyledSpinnerNext />
+    </div>
+  </>
+)}
+
+</div> */
+}

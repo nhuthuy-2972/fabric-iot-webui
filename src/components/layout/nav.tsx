@@ -2,7 +2,6 @@ import React from 'react'
 import { useStyletron } from 'baseui'
 import { Button } from 'baseui/button'
 import { Link, useHistory } from 'react-router-dom'
-import { Paragraph1, Paragraph2, Label2 } from 'baseui/typography'
 
 import { useAuth } from '../../hooks/use-auth'
 import {
@@ -14,13 +13,11 @@ import {
 } from 'baseui/modal'
 import axios from 'axios'
 import { Avatar } from 'baseui/avatar'
-import { PlusCircle, Plus, X, RotateCcw, Search, LogOut } from 'react-feather'
+import { LogOut } from 'react-feather'
 import { toaster } from 'baseui/toast'
-import { FieldArray, Form, Formik } from 'formik'
-import { Block } from 'baseui/block'
+import { Form, Formik } from 'formik'
 import { Input } from 'baseui/input'
 import { FormControl } from 'baseui/form-control'
-import { PhoneInput, COUNTRIES } from 'baseui/phone-input'
 
 export const Nav: React.FC<{}> = () => {
   const [css, theme] = useStyletron()
@@ -63,7 +60,6 @@ export const Nav: React.FC<{}> = () => {
         </div>
 
         <div className={css({ display: 'flex' })}>
-          {/* <div className={css({ marginTop: theme.sizing.scale200 })} ><Avatar name={state.user.displayName} src={state.user.photoURL}/></div> */}
           <Button
             size="mini"
             shape="round"
@@ -82,9 +78,6 @@ export const Nav: React.FC<{}> = () => {
           >
             <Avatar name={state.user.displayName} src={state.user.photoURL} />
           </Button>
-          {/* <Paragraph2 marginLeft="scale300" marginTop="scale400" marginRight="scale300" color="scale900">
-            {state.user.email}
-          </Paragraph2> */}
           <Button
             size="compact"
             onClick={() => {
@@ -97,7 +90,6 @@ export const Nav: React.FC<{}> = () => {
               BaseButton: {
                 style: {
                   marginLeft: theme.sizing.scale300,
-                  // backgroundColor : theme.colors.contentInverseSecondary,
                 },
               },
             }}
@@ -253,14 +245,6 @@ export const Nav: React.FC<{}> = () => {
                         },
                       }}
                     />
-                    {/* <PhoneInput
-                    country={country}
-                    onCountryChange={( event :any) => setCountry(event.option)}
-                    text={text}
-                    onTextChange={e => { 
-                      setText(e.currentTarget.value)}
-                    }
-                  /> */}
                   </FormControl>
                 </ModalBody>
                 <ModalFooter>

@@ -1,22 +1,14 @@
 import * as React from 'react'
 import { DeepstreamClient } from '@deepstream/client'
 import { useStyletron } from 'baseui'
-// import { Button } from 'baseui/button'
+import { Button } from 'baseui/button'
 // import moment from 'moment'
 import axios from 'axios'
 import { useParams, useHistory } from 'react-router-dom'
 import { db, useAuth } from '../../hooks/use-auth'
 import Display from './display'
-import { Settings, BatteryCharging } from 'react-feather'
-// import {
-//   Modal,
-//   ModalHeader,
-//   ModalBody,
-//   ModalFooter,
-//   ModalButton,
-//   FocusOnce,
-// } from 'baseui/modal'
-// import { Input, SIZE } from 'baseui/input'
+import { Settings, BarChart2, BatteryCharging } from 'react-feather'
+
 import { Block } from 'baseui/block'
 
 import createAuthRefreshInterceptor from 'axios-auth-refresh'
@@ -181,12 +173,6 @@ const StreamDevicesRef = ({ bcidentity, deviceinfo }: any) => {
     }
   }, [])
 
-  // console.log('co bc identity c', bcIdentity)
-
-  // console.log('info ne', bcidentity)
-  //console.log("fields", fields)
-  // console.log('name', device)
-  // console.log('history', history)
   return (
     <div className={css({})}>
       <div
@@ -201,11 +187,11 @@ const StreamDevicesRef = ({ bcidentity, deviceinfo }: any) => {
           <BatteryCharging color={theme.colors.black} size={33} />
           {` ${data.battery} %`}
         </div>
-        {/* <Button
-          onClick={() => setOpen(true)}
+        <Button
+          onClick={() => router.push(`/devices/refer/${id}/statistical`)}
           kind="secondary"
           startEnhancer={() => (
-            <Settings color={theme.colors.mono700} size={18} />
+            <BarChart2 color={theme.colors.mono700} size={18} />
           )}
           overrides={{
             BaseButton: {
@@ -216,29 +202,8 @@ const StreamDevicesRef = ({ bcidentity, deviceinfo }: any) => {
             },
           }}
         >
-          Chi tiết
+          Thống kê
         </Button>
-        <Modal onClose={() => setOpen(false)} isOpen={isOpen}>
-          <FocusOnce>
-            <ModalHeader>Chi tiết</ModalHeader>
-          </FocusOnce>
-          <ModalBody>
-            <div>Private key</div>
-            <Input value={private_key.toString()}
-              disabled
-              size={SIZE.mini}
-            />
-            <div>Token</div>
-            <Input
-              value={token.toString()}
-              disabled
-              size={SIZE.mini}
-            />
-
-          </ModalBody>
-          <ModalFooter>
-          </ModalFooter>
-        </Modal> */}
       </div>
 
       <div

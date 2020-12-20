@@ -89,50 +89,91 @@ export const Statistical = ({ bcidentity }: any) => {
   }
   React.useEffect(() => {
     console.log('set fields')
-    const getdata = async () => {
-      let docs = db.collection('device').doc(id)
 
-      await docs
-        .get()
-        .then(async (doc: any) => {
-          if (doc.exists && doc.data().auth === state.user.uid) {
-            let field = doc.get('data_fields')
-            setfields(field)
-            axios({
-              method: 'post',
-              headers: {
-                Authorization:
-                  'Bearer ' + sessionStorage.getItem(state.user.uid + id),
-              },
-              url: 'http://localhost:4002/api/device/datadevice',
+    const unsubscribe = db
+      .collection('fieldRef')
+      .where('auth', '==', state.user.uid)
+      .where('deviceID', '==', id)
+      .onSnapshot((doc) => {
+        doc.forEach((elem: any) => {
+          console.log(elem.id)
+          setfields(elem.data().data_fields)
+          axios({
+            method: 'post',
+            headers: {
+              Authorization:
+                'Bearer ' + sessionStorage.getItem(state.user.uid + id),
+            },
+            url: 'http://localhost:4002/api/device/datadevice',
+          })
+            .then((res: any) => {
+              console.log(res.data)
+              const data = res.data.map((item: any) => {
+                return {
+                  ...item.data,
+                  time: new Date(
+                    item.data.timestamp * 1000,
+                  ).toLocaleTimeString(),
+                }
+              })
+              console.log(data)
+
+              sethistory(data.reverse())
             })
-              .then((res: any) => {
-                console.log(res.data)
-                const data = res.data.map((item: any) => {
-                  return {
-                    ...item.data,
-                    time: new Date(
-                      item.data.timestamp * 1000,
-                    ).toLocaleTimeString(),
-                  }
-                })
-                console.log(data)
-
-                sethistory(data.reverse())
-              })
-              .catch((Err) => {
-                console.log(Err)
-              })
-          } else {
-            console.log('No such document!')
-          }
+            .catch((Err) => {
+              console.log(Err)
+            })
         })
-        .catch((err) => {
-          console.log('Error getting document', err)
-        })
-    }
-    getdata()
+      })
+    return () => unsubscribe()
   }, [])
+
+  // React.useEffect(() => {
+  //   console.log('set fields')
+  //   const getdata = async () => {
+  //     let docs = db.collection('device').doc(id)
+
+  //     await docs
+  //       .get()
+  //       .then(async (doc: any) => {
+  //         if (doc.exists && doc.data().auth === state.user.uid) {
+  //           let field = doc.get('data_fields')
+  //           setfields(field)
+  //           axios({
+  //             method: 'post',
+  //             headers: {
+  //               Authorization:
+  //                 'Bearer ' + sessionStorage.getItem(state.user.uid + id),
+  //             },
+  //             url: 'http://localhost:4002/api/device/datadevice',
+  //           })
+  //             .then((res: any) => {
+  //               console.log(res.data)
+  //               const data = res.data.map((item: any) => {
+  //                 return {
+  //                   ...item.data,
+  //                   time: new Date(
+  //                     item.data.timestamp * 1000,
+  //                   ).toLocaleTimeString(),
+  //                 }
+  //               })
+  //               console.log(data)
+
+  //               sethistory(data.reverse())
+  //             })
+  //             .catch((Err) => {
+  //               console.log(Err)
+  //             })
+  //         } else {
+  //           console.log('No such document!')
+  //         }
+  //       })
+  //       .catch((err) => {
+  //         console.log('Error getting document', err)
+  //       })
+  //   }
+  //   getdata()
+  // }, [])
 
   // React.useEffect(() => {
   //   function getds() {

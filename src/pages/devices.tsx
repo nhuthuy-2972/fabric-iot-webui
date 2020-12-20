@@ -1,14 +1,22 @@
 import * as React from 'react'
-import { useParams, useHistory } from 'react-router-dom'
+import {
+  BrowserRouter,
+  Route,
+  Switch,
+  useParams,
+  useHistory,
+} from 'react-router-dom'
 import StreamDevices from '../components/devices/stream'
 import { StyledSpinnerNext } from 'baseui/spinner'
-
+import { Statistical } from '../components/devices/statistical'
+import { Datepickper } from '../components/devices/datepicker'
 import { useStyletron } from 'baseui'
 import { toaster } from 'baseui/toast'
 import { useAuth } from '../hooks/use-auth'
 import { db } from '../hooks/use-auth'
 import dotenv from 'dotenv'
 import axios from 'axios'
+import { DevicesTable } from './table'
 dotenv.config()
 const DevicesPage = () => {
   const [css, theme] = useStyletron()
@@ -126,31 +134,63 @@ const DevicesPage = () => {
   // console.log(state.customClaims.token)
 
   return (
-    <div
-      className={css({
-        maxWidth: '999px',
-        padding: theme.sizing.scale400,
-        margin: `${theme.sizing.scale600} auto`,
-      })}
-    >
-      {bcIdenity !== '' && isTrue === true ? (
-        <StreamDevices bcidentity={bcIdenity}></StreamDevices>
-      ) : (
-        <>
-          <div
-            className={css({
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              height: '30vh',
-            })}
-          >
-            <StyledSpinnerNext />
-          </div>
-        </>
-      )}
-      {/* {check == true ? <StreamDevices info={infoDevice}></StreamDevices> : React.Fragment} */}
-    </div>
+    <Switch>
+      <Route exact path="/devices/owner/:id?">
+        <div
+          className={css({
+            maxWidth: '999px',
+            padding: theme.sizing.scale400,
+            margin: `${theme.sizing.scale600} auto`,
+          })}
+        >
+          {bcIdenity !== '' && isTrue === true ? (
+            <StreamDevices bcidentity={bcIdenity}></StreamDevices>
+          ) : (
+            <>
+              <div
+                className={css({
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  height: '30vh',
+                })}
+              >
+                <StyledSpinnerNext />
+              </div>
+            </>
+          )}
+          {/* {check == true ? <StreamDevices info={infoDevice}></StreamDevices> : React.Fragment} */}
+        </div>
+      </Route>
+      <Route exact path="/devices/owner/:id?/statistical">
+        <div
+          className={css({
+            maxWidth: '999px',
+            padding: theme.sizing.scale400,
+            margin: `${theme.sizing.scale600} auto`,
+          })}
+        >
+          {bcIdenity !== '' && isTrue === true ? (
+            // <Statistical bcidentity={bcIdenity}></Statistical>
+            <Statistical bcidentity={bcIdenity}></Statistical>
+          ) : (
+            <>
+              <div
+                className={css({
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  height: '30vh',
+                })}
+              >
+                <StyledSpinnerNext />
+              </div>
+            </>
+          )}
+          {/* {check == true ? <StreamDevices info={infoDevice}></StreamDevices> : React.Fragment} */}
+        </div>
+      </Route>
+    </Switch>
   )
 }
 

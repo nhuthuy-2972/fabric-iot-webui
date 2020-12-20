@@ -1,32 +1,3 @@
-// import * as React from 'react'
-// import {  useStyletron } from 'baseui'
-// import { Button } from 'baseui/button'
-// import {DevicesTable} from '../../pages/table'
-// import { PlusCircle, Plus, X, RotateCcw, Search } from 'react-feather'
-// import {
-//   Modal,
-//   ModalFooter,
-//   ModalButton,
-//   ModalHeader,
-//   ModalBody,
-// } from 'baseui/modal'
-
-// import { toaster } from 'baseui/toast'
-// import { db } from '../../hooks/use-auth'
-// import { useAuth } from '../../hooks/use-auth'
-// import { useHistory,useParams } from 'react-router-dom'
-// import axios from 'axios'
-
-// export const ShareDeviceManager = ()=>{
-//     const [refUSer ,setRefUser] = React.useState([])
-//     const { id }: any = useParams()
-
-//     React.useEffect(()=>{
-//         const unsubcrible = db.collection('device').doc(id)
-//     })
-//     return (<div>Share device manager</div>)
-// }
-
 import * as React from 'react'
 import { useParams, useHistory } from 'react-router-dom'
 import { useStyletron } from 'baseui'
@@ -41,7 +12,7 @@ import { FieldArray, Form, Formik } from 'formik'
 import { Block } from 'baseui/block'
 import { Input } from 'baseui/input'
 import { FormControl } from 'baseui/form-control'
-import {StatefulCheckbox, Checkbox, LABEL_PLACEMENT } from 'baseui/checkbox'
+import { StatefulCheckbox, Checkbox, LABEL_PLACEMENT } from 'baseui/checkbox'
 
 import {
   Modal,
@@ -61,65 +32,65 @@ export const ShareDeviceManager = () => {
   // const Location = useLocation()
   const [refUSer, setRefUser] = React.useState('loading')
   const [isOpen, setIsOpen] = React.useState(false)
-  const [device,setDevice] = React.useState({data_fields :[{field_name:'',field_display :'',field_unit :''}],name :''})
-
+  const [device, setDevice] = React.useState({
+    data_fields: [{ field_name: '', field_display: '', field_unit: '' }],
+    name: '',
+  })
 
   React.useEffect(() => {
-    let unsubcrible :any
-    try{
-      unsubcrible = db.collection('device').doc(id).onSnapshot(async (doc :any)=>{
-        console.log("snapshot ne" ,doc.data())
-        if (
-          doc.exists &&
-          doc.data().auth === state.user.uid &&
-          doc.data().actived === 'yes'
-        ){
-          setDevice(doc.data())
-          console.log("oke")
-          const getuserRef = doc.data().refUser
-          console.log(getuserRef)
-          try {
-            const result = await axios({
-              method: 'post',
-              url: 'http://192.168.0.100:4002/api/user/getrefuserinfo',
-              headers: {
-                Authorization: 'Bearer ' + state.customClaims.token,
-              },
-              data: {
-                refUsers: getuserRef,
-                deviceID: id,
-              },
-            })
+    let unsubcrible: any
+    try {
+      unsubcrible = db
+        .collection('device')
+        .doc(id)
+        .onSnapshot(async (doc: any) => {
+          console.log('snapshot ne', doc.data())
+          if (
+            doc.exists &&
+            doc.data().auth === state.user.uid &&
+            doc.data().actived === 'yes'
+          ) {
+            setDevice(doc.data())
+            console.log('oke')
+            const getuserRef = doc.data().refUser
+            console.log(getuserRef)
+            try {
+              const result = await axios({
+                method: 'post',
+                url: 'http://192.168.0.100:4002/api/user/getrefuserinfo',
+                headers: {
+                  Authorization: 'Bearer ' + state.customClaims.token,
+                },
+                data: {
+                  refUsers: getuserRef,
+                  deviceID: id,
+                },
+              })
 
-            console.log(result.data)
-            if (result.data.success === true) {
-              console.log(result.data.users)
-              setRefUser(result.data.users)
+              console.log(result.data)
+              if (result.data.success === true) {
+                console.log(result.data.users)
+                setRefUser(result.data.users)
+              }
+            } catch (err) {
+              console.log(err)
+              toaster.warning('Không có quyền truy cập!!!', {
+                autoHideDuration: 5000,
+              })
+              router.replace(`/`)
             }
-          } catch (err) {
-            console.log(err)
+          } else {
             toaster.warning('Không có quyền truy cập!!!', {
               autoHideDuration: 5000,
             })
             router.replace(`/`)
           }
-  
-  
-
-        } else {
-          toaster.warning('Không có quyền truy cập!!!', {
-            autoHideDuration: 5000,
-          })
-          router.replace(`/`)
-        }
-      }
-    )
-    }catch(err)
-    {
+        })
+    } catch (err) {
       console.log(err.message)
       router.replace('/')
     }
-    return () => unsubcrible();
+    return () => unsubcrible()
   }, [state.customClaims.token, state.user.uid, id, router])
   // console.log('ref', refUSer)
   // console.log("State" ,Location.state)
@@ -132,13 +103,13 @@ export const ShareDeviceManager = () => {
       })}
     >
       <div
-          className={css({
-            ...theme.typography.font650,
-            marginBottom: theme.sizing.scale800,
-          })}
-        >
-          {`THIẾT BỊ ${device.name}(${id})`}
-        </div>
+        className={css({
+          ...theme.typography.font650,
+          marginBottom: theme.sizing.scale800,
+        })}
+      >
+        {`THIẾT BỊ ${device.name}(${id})`}
+      </div>
       <div
         className={css({
           display: 'flex',
@@ -204,7 +175,7 @@ export const ShareDeviceManager = () => {
       )}
 
       {refUSer !== 'loading' && refUSer.length > 0 && (
-        <UsersTable users={refUSer} dataf={device}/>
+        <UsersTable users={refUSer} dataf={device} />
       )}
 
       <Modal
@@ -228,11 +199,9 @@ export const ShareDeviceManager = () => {
         <Formik
           initialValues={{
             deviceID: id,
-            email : '',
-            data_field_choosen : [] as any,
-            data_fields : [
-              ...device.data_fields
-            ] 
+            email: '',
+            data_field_choosen: [] as any,
+            data_fields: [...device.data_fields],
           }}
           onSubmit={async (values, actions) => {
             actions.setSubmitting(true)
@@ -240,11 +209,10 @@ export const ShareDeviceManager = () => {
             // console.log("value",values)
             let data: any = values
             try {
-              
               for (const i in data.data_fields) {
-              // console.log(data.data_fields[i])
-              delete data.data_fields[i].max
-              delete data.data_fields[i].min
+                // console.log(data.data_fields[i])
+                delete data.data_fields[i].max
+                delete data.data_fields[i].min
               }
               console.log(data)
 
@@ -255,17 +223,16 @@ export const ShareDeviceManager = () => {
                   Authorization: 'Bearer ' + state.customClaims.token,
                 },
                 data: {
-                  deviceID : data.deviceID,
-                  email : data.email,
-                  sensors:data.data_fields
+                  deviceID: data.deviceID,
+                  email: data.email,
+                  sensors: data.data_fields,
                 },
               })
               console.log('ket qua them may: ', result.data)
-              if(result.data.success === false)
-              {
+              if (result.data.success === false) {
                 toaster.negative(
                   <div className={css({ ...theme.typography.font200 })}>
-                   {result.data.message}
+                    {result.data.message}
                   </div>,
                   {
                     autoHideDuration: 3000,
@@ -279,7 +246,7 @@ export const ShareDeviceManager = () => {
                     },
                   },
                 )
-              }else{
+              } else {
                 toaster.positive(
                   <div className={css({ ...theme.typography.font200 })}>
                     Thêm thiết bị thành công!
@@ -295,7 +262,8 @@ export const ShareDeviceManager = () => {
                       },
                     },
                   },
-                )}
+                )
+              }
               // setWarning(false)
               actions.setSubmitting(false)
               setIsOpen(false)
@@ -345,22 +313,22 @@ export const ShareDeviceManager = () => {
                   />
                 </FormControl>
                 <FormControl label="Email">
-                    <Input
-                      required
-                      name="email"
-                      type="text"
-                      onChange={handleChange}
-                      value={values.email}
-                      overrides={{
-                        InputContainer: {
-                          style: {
-                            borderTopLeftRadius: theme.sizing.scale400,
-                            borderBottomRightRadius: theme.sizing.scale400,
-                          },
+                  <Input
+                    required
+                    name="email"
+                    type="text"
+                    onChange={handleChange}
+                    value={values.email}
+                    overrides={{
+                      InputContainer: {
+                        style: {
+                          borderTopLeftRadius: theme.sizing.scale400,
+                          borderBottomRightRadius: theme.sizing.scale400,
                         },
-                      }}
-                    />
-                  </FormControl>
+                      },
+                    }}
+                  />
+                </FormControl>
                 <FieldArray
                   name="data_fields"
                   render={(arrayHelpers) => (
@@ -373,7 +341,7 @@ export const ShareDeviceManager = () => {
 
                       {values.data_fields &&
                         values.data_fields.length > 0 &&
-                        values.data_fields.map((data_field :any, i) => (
+                        values.data_fields.map((data_field: any, i) => (
                           <div key={i}>
                             <Block
                               display="flex"
@@ -449,35 +417,21 @@ export const ShareDeviceManager = () => {
                                   />
                                 </FormControl>
                               </Block>
-                              {/* <Block marginTop="scale500">
-                                <Button
-                                  disabled={
-                                    values.data_fields.length === 1
-                                      ? true
-                                      : false
-                                  }
-                                  type="button"
-                                  shape="round"
-                                  kind="tertiary"
-                                  onClick={() => arrayHelpers.remove(i)}
-                                >
-                                  <X size={18} color={theme.colors.mono700} />
-                                </Button>
-                              </Block> */}
+
                               <Block marginTop="scale500">
                                 <StatefulCheckbox
-                                  initialState={{checked : false}}
-                                  onChange={(e:any) =>{
-                                  console.log(e.target.checked)
-                                  const checked = e.target.checked
-                                  if(checked)
-                                  {
-                                    data_field.share = true
-                                  }else{
-                                    data_field.share = false
-                                  }
-                                  console.log(values.data_fields)
-                                }}/>
+                                  initialState={{ checked: false }}
+                                  onChange={(e: any) => {
+                                    console.log(e.target.checked)
+                                    const checked = e.target.checked
+                                    if (checked) {
+                                      data_field.share = true
+                                    } else {
+                                      data_field.share = false
+                                    }
+                                    console.log(values.data_fields)
+                                  }}
+                                />
                               </Block>
                             </Block>
                           </div>

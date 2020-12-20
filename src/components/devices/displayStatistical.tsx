@@ -12,14 +12,8 @@ import {
   Tooltip,
   Line,
 } from 'recharts'
-
-// moment().zone(7)
-
-// const CustomizedLabel = ({ x, y, stroke, value }: any) => {
-
-//   return <text x={x} y={y} dy={-10} fill="#ec157a" fontSize={12} textAnchor="middle">{value}</text>
-
-// }
+import { time } from 'console'
+import { th } from 'date-fns/locale'
 
 const CustomizedAxisTick = ({ x, y, stroke, payload }: any) => {
   return (
@@ -41,8 +35,32 @@ const CustomizedAxisTick = ({ x, y, stroke, payload }: any) => {
   )
 }
 
-const Display = ({ field, data, history }: any) => {
+const DisplayStatistical = ({ field, history }: any) => {
   const [css, theme] = useStyletron()
+  const [collect, setCollect]: any = React.useState({
+    min: { value: 0, time: '' },
+    max: { value: 0, time: '' },
+  })
+  React.useEffect(() => {
+    let minnum: any = 0
+    let maxnum: any = 0
+    if (history.length > 0) {
+      minnum = history.reduce((p: any, v: any) => {
+        return p[field.field_name] < v[field.field_name] ? p : v
+      })
+      console.log('min', field.field_name, minnum[field.field_name])
+
+      maxnum = history.reduce((p: any, v: any) => {
+        return p[field.field_name] > v[field.field_name] ? p : v
+      })
+      console.log('max', field.field_name, maxnum[field.field_name])
+
+      setCollect({
+        min: { value: minnum[field.field_name], time: minnum['timestamp'] },
+        max: { value: maxnum[field.field_name], time: minnum['timestamp'] },
+      })
+    }
+  }, [])
   return (
     <>
       <div
@@ -53,6 +71,7 @@ const Display = ({ field, data, history }: any) => {
           borderBottomRightRadius: theme.sizing.scale400,
           boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
           marginRight: theme.sizing.scale600,
+          marginBottom: theme.sizing.scale300,
         })}
       >
         <div
@@ -71,30 +90,55 @@ const Display = ({ field, data, history }: any) => {
             <div className={css({ ...theme.typography.font400 })}>
               {field.field_display}
             </div>
-            <div
-              className={css({
-                color: theme.colors.mono800,
-              })}
-            >
-              {/* {moment(new Date(data['timestamp'] * 1000).toLocaleString()).format("[Lúc] hh:mm:ss a [ngày ] DD [tháng ] MM [năm ] YYYY")} */}
-              {new Date(data['timestamp'] * 1000).toLocaleString()}
-            </div>
           </div>
         </div>
         <div
           className={css({
-            ...theme.typography.font1050,
+            ...theme.typography.font200,
             fontWeight: 'normal',
-            fontSize: '46px',
-            paddingTop: theme.sizing.scale1000,
-            paddingBottom: theme.sizing.scale800,
+            paddingTop: theme.sizing.scale800,
             paddingLeft: theme.sizing.scale800,
-            paddingRight: theme.sizing.scale800,
-            borderBottom: theme.colors.mono300,
-            textAlign: 'center',
+            paddingBottom: theme.sizing.scale500,
           })}
         >
-          {`${data[field.field_name] || ''} ${field.field_unit || ''}`}
+          <div
+            className={css({
+              fontSize: '25px',
+            })}
+          >
+            Min : {`${collect.min.value} ${field.field_unit}`}
+          </div>
+          <div
+            className={css({
+              marginTop: theme.sizing.scale300,
+              color: theme.colors.contentInverseTertiary,
+            })}
+          >
+            {new Date(collect.min.time * 1000).toLocaleString()}
+          </div>
+        </div>
+        <div
+          className={css({
+            ...theme.typography.font200,
+            fontWeight: 'normal',
+            paddingLeft: theme.sizing.scale800,
+          })}
+        >
+          <div
+            className={css({
+              fontSize: '25px',
+            })}
+          >
+            Max : {`${collect.max.value} ${field.field_unit}`}
+          </div>
+          <div
+            className={css({
+              marginTop: theme.sizing.scale300,
+              color: theme.colors.contentInverseTertiary,
+            })}
+          >
+            {new Date(collect.max.time * 1000).toLocaleString()}
+          </div>
         </div>
       </div>
       <div
@@ -104,6 +148,7 @@ const Display = ({ field, data, history }: any) => {
           borderTopLeftRadius: theme.sizing.scale400,
           borderBottomRightRadius: theme.sizing.scale400,
           boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+          marginBottom: theme.sizing.scale300,
         })}
       >
         <div
@@ -121,8 +166,7 @@ const Display = ({ field, data, history }: any) => {
           </div>
           <div>
             <div className={css({ ...theme.typography.font400 })}>
-              {field.field_display} (Trong khoảng 24 giờ kể từ lần cập nhật cuối
-              cùng)
+              {field.field_display}
             </div>
           </div>
         </div>
@@ -153,12 +197,14 @@ const Display = ({ field, data, history }: any) => {
 
               <Tooltip />
               <Line
+                unit={field.field_unit}
                 isAnimationActive={false}
                 // animationEasing="linear"
                 type="linear"
                 dataKey={field.field_name}
-                stroke="#ec157a"
-                fill="#ec157a"
+                strokeWidth="2px"
+                stroke="#757575"
+                fill="#21A453"
               />
             </LineChart>
           </ResponsiveContainer>
@@ -168,4 +214,4 @@ const Display = ({ field, data, history }: any) => {
   )
 }
 
-export default Display
+export default DisplayStatistical
