@@ -7,7 +7,7 @@ import axios from 'axios'
 import { useParams, useLocation, useHistory } from 'react-router-dom'
 import { db, useAuth } from '../../hooks/use-auth'
 import Display from './display'
-import { Settings } from 'react-feather'
+import { Settings, BarChart2, BatteryCharging } from 'react-feather'
 import {
   Modal,
   ModalHeader,
@@ -34,6 +34,8 @@ const StreamDevices = ({ bcidentity }: any) => {
   const [device, setdevice] = React.useState(Object)
   const [isOpen, setOpen] = React.useState(false)
   const { state }: any = useAuth()
+  const space = css({ marginRight: theme.sizing.scale500 })
+
   console.log('aasfasfsaf', bcidentity)
 
   const refreshAuthLogic = (failedRequest: any) =>
@@ -109,7 +111,7 @@ const StreamDevices = ({ bcidentity }: any) => {
             const data = res.data.map((item: any) => {
               return {
                 ...item.data,
-                time: new Date(item.data.timestamp * 1000).toLocaleTimeString(),
+                time: new Date(item.data.timestamp * 1000).toLocaleString(),
               }
             })
             console.log(data)
@@ -142,16 +144,24 @@ const StreamDevices = ({ bcidentity }: any) => {
         })}
       >
         <div className={css({ ...theme.typography.font550 })}>
-          {`${device.name || 'X iot'} (${device.desc || ''})`} Batery :{' '}
-          {data.history.slice(-1).pop()
-            ? `${data.history.slice(-1).pop().battery} %`
-            : ''}
+          {`${device.name || 'X iot'} (${id})`}
+          {/* Batery :{' '} */}
+          {data.history.slice(-1).pop() ? (
+            <>
+              {' '}
+              <BatteryCharging color={theme.colors.black} size={33} />{' '}
+              {`  ${data.history.slice(-1).pop().battery} %`}
+            </>
+          ) : (
+            ''
+          )}
         </div>
+
         <Button
-          onClick={() => setOpen(true)}
+          onClick={() => router.push(`/devices/owner/${id}/statistical`)}
           kind="secondary"
           startEnhancer={() => (
-            <Settings color={theme.colors.mono700} size={18} />
+            <BarChart2 color={theme.colors.mono700} size={18} />
           )}
           overrides={{
             BaseButton: {
@@ -162,15 +172,8 @@ const StreamDevices = ({ bcidentity }: any) => {
             },
           }}
         >
-          Chi tiết
+          Thống kê
         </Button>
-        <Modal onClose={() => setOpen(false)} isOpen={isOpen}>
-          <FocusOnce>
-            <ModalHeader>Chi tiết</ModalHeader>
-          </FocusOnce>
-          <ModalBody></ModalBody>
-          <ModalFooter></ModalFooter>
-        </Modal>
       </div>
 
       <div

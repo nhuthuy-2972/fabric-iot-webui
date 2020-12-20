@@ -7,7 +7,7 @@ import axios from 'axios'
 import { useParams, useHistory } from 'react-router-dom'
 import { db, useAuth } from '../../hooks/use-auth'
 import Display from './display'
-// // import { Settings } from 'react-feather';
+import { Settings, BatteryCharging } from 'react-feather'
 // import {
 //   Modal,
 //   ModalHeader,
@@ -17,13 +17,15 @@ import Display from './display'
 //   FocusOnce,
 // } from 'baseui/modal'
 // import { Input, SIZE } from 'baseui/input'
+import { Block } from 'baseui/block'
+
 import createAuthRefreshInterceptor from 'axios-auth-refresh'
 import { resolve } from 'dns'
 import { rejects } from 'assert'
 
 // moment().zone(7)
 
-const StreamDevicesRef = ({ bcidentity }: any) => {
+const StreamDevicesRef = ({ bcidentity, deviceinfo }: any) => {
   const [css, theme] = useStyletron()
   const [data, setData]: any = React.useState(Object)
   const [data1, setData1]: any = React.useState({
@@ -34,11 +36,11 @@ const StreamDevicesRef = ({ bcidentity }: any) => {
   const [history, sethistory] = React.useState(Object)
   const [fields, setfields] = React.useState(Array)
   const router = useHistory()
-  const [bcIdentity, setbcIdentity] = React.useState('')
-  const [device, setdevice] = React.useState(Object)
+
   const [isOpen, setOpen] = React.useState(false)
   const { state }: any = useAuth()
   console.log('identity hihihhihi', bcidentity)
+  console.log('info', deviceinfo)
   // axios.interceptors.request.use((request) => {
   //   request.headers['Authorization'] =
   //     `Bearer ` + sessionStorage.getItem(state.user.uid + id)
@@ -99,20 +101,43 @@ const StreamDevicesRef = ({ bcidentity }: any) => {
 
   React.useEffect(() => {
     console.log('set fields')
-    const getdata = async () => {
-      await db
-        .collection('fieldRef')
-        .where('auth', '==', state.user.uid)
-        .where('deviceID', '==', id)
-        .onSnapshot((doc) => {
-          doc.forEach((elem: any) => {
-            console.log(elem.id)
-            setfields(elem.data().data_fields)
-            setdevice({ name: 'asfasf', desc: 'ASfasfas' })
+
+    const unsubscribe = db
+      .collection('fieldRef')
+      .where('auth', '==', state.user.uid)
+      .where('deviceID', '==', id)
+      .onSnapshot((doc) => {
+        doc.forEach((elem: any) => {
+          console.log(elem.id)
+          setfields(elem.data().data_fields)
+          axios({
+            method: 'post',
+            headers: {
+              Authorization:
+                'Bearer ' + sessionStorage.getItem(state.user.uid + id),
+            },
+            url: 'http://localhost:4002/api/device/datadevice',
           })
+            .then((res: any) => {
+              console.log(res.data)
+              const data = res.data.map((item: any) => {
+                return {
+                  ...item.data,
+                  time: new Date(
+                    item.data.timestamp * 1000,
+                  ).toLocaleTimeString(),
+                }
+              })
+              console.log(data)
+              // setData1({ data: value, history: data.reverse() })
+              sethistory(data.reverse())
+            })
+            .catch((Err) => {
+              console.log(Err)
+            })
         })
-    }
-    getdata()
+      })
+    return () => unsubscribe()
   }, [])
 
   React.useEffect(() => {
@@ -122,7 +147,7 @@ const StreamDevicesRef = ({ bcidentity }: any) => {
 
     function getds() {
       record.subscribe(`news/${id}`, async (value: any) => {
-        // await setData(value)
+        await setData(value)
         console.log('valuene ', value)
         axios({
           method: 'post',
@@ -141,8 +166,8 @@ const StreamDevicesRef = ({ bcidentity }: any) => {
               }
             })
             console.log(data)
-            setData1({ data: value, history: data.reverse() })
-            // sethistory(data.reverse())
+            // setData1({ data: value, history: data.reverse() })
+            sethistory(data.reverse())
           })
           .catch((Err) => {
             console.log(Err)
@@ -172,10 +197,9 @@ const StreamDevicesRef = ({ bcidentity }: any) => {
         })}
       >
         <div className={css({ ...theme.typography.font550 })}>
-          {`${device.name || 'X iot'} (${device.desc || ''})`} Batery :{' '}
-          {data1.history.slice(-1).pop()
-            ? `${data1.history.slice(-1).pop().battery} %`
-            : ''}
+          {`${deviceinfo.name || 'X iot'} (${deviceinfo.desc || ''}) `}
+          <BatteryCharging color={theme.colors.black} size={33} />
+          {` ${data.battery} %`}
         </div>
         {/* <Button
           onClick={() => setOpen(true)}
@@ -230,8 +254,8 @@ const StreamDevicesRef = ({ bcidentity }: any) => {
             <Display
               key={Math.random() * 10 + i}
               field={ite}
-              data={data1.data}
-              history={data1.history}
+              data={data}
+              history={history}
             ></Display>
           )
         })}

@@ -16,7 +16,7 @@
     "axios": "^0.19.2",
     "axios-auth-refresh": "^3.0.0",
     "baseui": "^9.60.0",
-    "date-fns": "^2.10.0",
+    "date-fns": "^2.16.1",
     "deepstream.io-tools-react": "^0.1.5",
     "firebase": "^7.9.3",
     "formik": "^2.1.4",

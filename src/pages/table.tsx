@@ -155,7 +155,7 @@ const Row = ({ striped, row, type }: any) => {
               <Button
                 disabled={row.actived !== 'yes' ? true : false}
                 size="compact"
-                kind="tertiary"
+                kind="secondary"
                 onClick={() => {
                   router.replace(`/devices/sharemanager/${row.deviceID}`, {
                     device: row,

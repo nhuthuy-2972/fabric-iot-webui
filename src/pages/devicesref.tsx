@@ -17,7 +17,7 @@ const DevicesPageRef = () => {
   console.log('state ne :', state)
   const [isTrue, setTrue] = React.useState(false)
   const [bcIdenity, setbcIdentity] = React.useState('')
-  const [deviceFields, setdevicefield] = React.useState([])
+  const [deviceInfo, setdeviceInfo] = React.useState('')
   const router = useHistory()
   React.useEffect(() => {
     const getdata = async () => {
@@ -31,8 +31,10 @@ const DevicesPageRef = () => {
               autoHideDuration: 5000,
             })
             router.replace(`/devices/owner/${id}`)
-          } else {
+          } else if (doc.exists) {
             console.log('yes!')
+            const info: any = { name: doc.data().name, desc: doc.data().desc }
+            setdeviceInfo(info)
             db.collection('bcAccounts')
               .where('auth', '==', state.user.uid)
               .where('deviceID', '==', id)
@@ -47,6 +49,7 @@ const DevicesPageRef = () => {
                       bcIdentity: devdata.bcIdentity,
                     }
                     setbcIdentity(devdata.bcIdentity)
+
                     console.log(devdata.bcIdentity)
                   })
                   const result = await axios({
@@ -93,8 +96,11 @@ const DevicesPageRef = () => {
         margin: `${theme.sizing.scale600} auto`,
       })}
     >
-      {bcIdenity !== '' && isTrue === true ? (
-        <StreamDevicesRef bcidentity={bcIdenity}></StreamDevicesRef>
+      {bcIdenity !== '' && deviceInfo !== '' && isTrue === true ? (
+        <StreamDevicesRef
+          bcidentity={bcIdenity}
+          deviceinfo={deviceInfo}
+        ></StreamDevicesRef>
       ) : (
         <>
           <div

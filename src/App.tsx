@@ -7,6 +7,8 @@ import { Provider as StyletronProvider } from 'styletron-react' //theme
 
 import IndexPage from './pages'
 import DevicesPage from './pages/devices'
+import DevicesPageCP from './pages/devices copy'
+
 import { Statistical } from './components/devices/statistical'
 import DevicesPagaRef from './pages/devicesref'
 // import ManagerMiddleWare from './pages/shareDeviceManagerMiddleware'
@@ -29,13 +31,13 @@ const App: React.FC<{}> = () => {
                   <Route exact path="/">
                     <IndexPage />
                   </Route>
-                  <Route exact path="/devices/owner/:id?">
-                    <DevicesPage />
+                  <Route path="/devices/owner/:id?">
+                    <DevicesPageCP />
                     {/* <Switch>
                       <Route exact path="/devices/owner/:id?">
                         <DevicesPage />
                       </Route>
-                      <Route exact path="/devices/owner/:id?/statistical">
+                      <Route exact path="/devices/owner/:id?/v">
                         <Statistical />
                       </Route>
                     </Switch> */}

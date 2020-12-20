@@ -43,6 +43,8 @@ const CustomizedAxisTick = ({ x, y, stroke, payload }: any) => {
 
 const Display = ({ field, data, history }: any) => {
   const [css, theme] = useStyletron()
+  const space = css({ marginBottom: theme.sizing.scale500 })
+
   return (
     <>
       <div
@@ -53,6 +55,7 @@ const Display = ({ field, data, history }: any) => {
           borderBottomRightRadius: theme.sizing.scale400,
           boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
           marginRight: theme.sizing.scale600,
+          marginBottom: theme.sizing.scale300,
         })}
       >
         <div
@@ -104,6 +107,7 @@ const Display = ({ field, data, history }: any) => {
           borderTopLeftRadius: theme.sizing.scale400,
           borderBottomRightRadius: theme.sizing.scale400,
           boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+          marginBottom: theme.sizing.scale300,
         })}
       >
         <div
