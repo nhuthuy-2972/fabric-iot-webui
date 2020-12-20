@@ -77,6 +77,7 @@ const Row = ({ striped, row, dataf }: any) => {
   })
   const { id }: any = useParams()
   const router = useHistory()
+
   React.useEffect(() => {
     const getattrs = async () => {
       try {
@@ -188,8 +189,62 @@ const Row = ({ striped, row, dataf }: any) => {
                 }),
               },
             }}
-            onClick={() => {
+            onClick={(e) => {
               // router.push(`/devices/display/${row.deviceID}`)
+              console.log('sssss')
+              e.preventDefault()
+              const revoke = async () => {
+                try {
+                  const result = await axios({
+                    method: 'post',
+                    headers: {
+                      Authorization: 'Bearer ' + state.customClaims.token,
+                    },
+                    url: 'http://192.168.0.100:4002/api/user/revokeuser',
+                    data: {
+                      deviceID: id,
+                      auth: row.uid,
+                    },
+                  })
+
+                  console.log(result.data)
+                  toaster.warning(
+                    <div className={css({ ...theme.typography.font200 })}>
+                      Xóa người dùng thành công!!
+                    </div>,
+                    {
+                      autoHideDuration: 3000,
+                      overrides: {
+                        Body: {
+                          style: {
+                            borderTopLeftRadius: theme.sizing.scale400,
+                            borderBottomRightRadius: theme.sizing.scale400,
+                          },
+                        },
+                      },
+                    },
+                  )
+                } catch (error) {
+                  toaster.warning(
+                    <div className={css({ ...theme.typography.font200 })}>
+                      Đã có lỗi xãy ra!!
+                    </div>,
+                    {
+                      autoHideDuration: 3000,
+                      overrides: {
+                        Body: {
+                          style: {
+                            borderTopLeftRadius: theme.sizing.scale400,
+                            borderBottomRightRadius: theme.sizing.scale400,
+                          },
+                        },
+                      },
+                    },
+                  )
+                  router.replace('/')
+                }
+              }
+              revoke()
             }}
           >
             Xóa
