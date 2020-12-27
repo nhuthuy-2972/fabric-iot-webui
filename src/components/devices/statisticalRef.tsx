@@ -5,7 +5,7 @@ import axios from 'axios'
 import { useParams, useHistory } from 'react-router-dom'
 import { db, useAuth } from '../../hooks/use-auth'
 import DisplayStatistical from './displayStatistical'
-
+import { Download, Activity } from 'react-feather'
 import { FormControl } from 'baseui/form-control'
 import { ArrowRight } from 'baseui/icon'
 import { Datepicker, formatDate } from 'baseui/datepicker'
@@ -33,7 +33,7 @@ export const Statistical = ({ bcidentity }: any) => {
   const refreshAuthLogic = (failedRequest: any) =>
     axios({
       method: 'post',
-      url: 'http://localhost:4002/api/user/gettoken',
+      url: process.env.REACT_APP_API_EXPRESS + '/api/user/gettoken',
       headers: {
         Authorization: 'Bearer ' + state.customClaims.token,
       },
@@ -65,7 +65,8 @@ export const Statistical = ({ bcidentity }: any) => {
       headers: {
         Authorization: 'Bearer ' + sessionStorage.getItem(state.user.uid + id),
       },
-      url: 'http://localhost:4002/api/device/datastatisticaldevice',
+      url:
+        process.env.REACT_APP_API_EXPRESS + '/api/device/datastatisticaldevice',
       data: {
         startDate: startDate,
         endDate: endDate,
@@ -82,6 +83,34 @@ export const Statistical = ({ bcidentity }: any) => {
         console.log(data)
 
         sethistory(data.reverse())
+      })
+      .catch((Err) => {
+        console.log(Err)
+      })
+  }
+  const downloaddata = async (startDate: any, endDate: any) => {
+    axios({
+      method: 'post',
+      headers: {
+        Authorization: 'Bearer ' + sessionStorage.getItem(state.user.uid + id),
+      },
+      url:
+        process.env.REACT_APP_API_EXPRESS +
+        '/api/device/downloadstatisticaldevice',
+      responseType: 'blob',
+      data: {
+        startDate: startDate,
+        endDate: endDate,
+      },
+    })
+      .then((res: any) => {
+        const url = window.URL.createObjectURL(new Blob([res.data]))
+        const link = document.createElement('a')
+        link.href = url
+        link.setAttribute('download', 'data.csv') //or any other extension
+        document.body.appendChild(link)
+        link.click()
+        link.remove()
       })
       .catch((Err) => {
         console.log(Err)
@@ -104,7 +133,7 @@ export const Statistical = ({ bcidentity }: any) => {
               Authorization:
                 'Bearer ' + sessionStorage.getItem(state.user.uid + id),
             },
-            url: 'http://localhost:4002/api/device/datadevice',
+            url: process.env.REACT_APP_API_EXPRESS + '/api/device/datadevice',
           })
             .then((res: any) => {
               console.log(res.data)
@@ -131,7 +160,7 @@ export const Statistical = ({ bcidentity }: any) => {
   // React.useEffect(() => {
   //   console.log('set fields')
   //   const getdata = async () => {
-  //     let docs = db.collection('device').doc(id)
+  //     let docs = db.collection('devices').doc(id)
 
   //     await docs
   //       .get()
@@ -145,7 +174,7 @@ export const Statistical = ({ bcidentity }: any) => {
   //               Authorization:
   //                 'Bearer ' + sessionStorage.getItem(state.user.uid + id),
   //             },
-  //             url: 'http://localhost:4002/api/device/datadevice',
+  //             url: process.env.REACT_APP_API_EXPRESS + '/api/device/datadevice',
   //           })
   //             .then((res: any) => {
   //               console.log(res.data)
@@ -183,7 +212,7 @@ export const Statistical = ({ bcidentity }: any) => {
   //         Authorization:
   //           'Bearer ' + sessionStorage.getItem(state.user.uid + id),
   //       },
-  //       url: 'http://localhost:4002/api/device/datadevice',
+  //       url: process.env.REACT_APP_API_EXPRESS + '/api/device/datadevice',
   //     })
   //       .then((res: any) => {
   //         console.log(res.data)
@@ -296,6 +325,7 @@ export const Statistical = ({ bcidentity }: any) => {
               getdata(startDate, endDate)
             }}
             kind="secondary"
+            startEnhancer={<Activity size={18}></Activity>}
             overrides={{
               BaseButton: {
                 style: {
@@ -307,6 +337,36 @@ export const Statistical = ({ bcidentity }: any) => {
             }}
           >
             Xem
+          </Button>
+        </div>
+        <div
+          className={css({
+            marginTop: '-15px',
+            marginLeft: theme.sizing.scale300,
+          })}
+        >
+          <Button
+            onClick={(e) => {
+              e.preventDefault()
+              console.log(Math.ceil(dates[0].getTime() / 1000))
+              console.log(Math.ceil(dates[1].getTime() / 1000))
+              const startDate: any = Math.ceil(dates[0].getTime() / 1000)
+              const endDate: any = Math.ceil(dates[1].getTime() / 1000)
+              downloaddata(startDate, endDate)
+            }}
+            kind="secondary"
+            startEnhancer={<Download size={18}></Download>}
+            overrides={{
+              BaseButton: {
+                style: {
+                  backgroundColor: theme.colors.contentInverseSecondary,
+                  borderTopLeftRadius: theme.sizing.scale400,
+                  borderBottomRightRadius: theme.sizing.scale400,
+                },
+              },
+            }}
+          >
+            Download CSV
           </Button>
         </div>
       </div>

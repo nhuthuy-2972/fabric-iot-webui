@@ -13,7 +13,10 @@ import { Block } from 'baseui/block'
 import { Input } from 'baseui/input'
 import { FormControl } from 'baseui/form-control'
 import { StatefulCheckbox, Checkbox, LABEL_PLACEMENT } from 'baseui/checkbox'
-
+import 'core-js/es6/promise'
+import 'core-js/es6/set'
+import 'core-js/es6/map'
+// import * as Yup from 'yup'
 import {
   Modal,
   ModalFooter,
@@ -41,14 +44,14 @@ export const ShareDeviceManager = () => {
     let unsubcrible: any
     try {
       unsubcrible = db
-        .collection('device')
+        .collection('devices')
         .doc(id)
         .onSnapshot(async (doc: any) => {
           console.log('snapshot ne', doc.data())
           if (
             doc.exists &&
             doc.data().auth === state.user.uid &&
-            doc.data().actived === 'yes'
+            doc.data().actived === true
           ) {
             setDevice(doc.data())
             console.log('oke')
@@ -57,7 +60,9 @@ export const ShareDeviceManager = () => {
             try {
               const result = await axios({
                 method: 'post',
-                url: 'http://192.168.0.100:4002/api/user/getrefuserinfo',
+                url:
+                  process.env.REACT_APP_API_EXPRESS +
+                  '/api/user/getrefuserinfo',
                 headers: {
                   Authorization: 'Bearer ' + state.customClaims.token,
                 },
@@ -218,7 +223,8 @@ export const ShareDeviceManager = () => {
 
               const result = await axios({
                 method: 'post',
-                url: 'http://192.168.0.100:4002/api/user/sharedevice',
+                url:
+                  process.env.REACT_APP_API_EXPRESS + '/api/user/sharedevice',
                 headers: {
                   Authorization: 'Bearer ' + state.customClaims.token,
                 },
@@ -289,7 +295,7 @@ export const ShareDeviceManager = () => {
             }
           }}
         >
-          {({ handleChange, values, isSubmitting }) => (
+          {({ handleChange, errors, values, isSubmitting }) => (
             <Form>
               <ModalHeader>CHIA SẼ THIẾT BỊ</ModalHeader>
               <ModalBody>
@@ -316,7 +322,7 @@ export const ShareDeviceManager = () => {
                   <Input
                     required
                     name="email"
-                    type="text"
+                    type="email"
                     onChange={handleChange}
                     value={values.email}
                     overrides={{
@@ -329,6 +335,11 @@ export const ShareDeviceManager = () => {
                     }}
                   />
                 </FormControl>
+                {errors.email ? (
+                  <div className={css({ color: theme.colors.warning })}>
+                    {errors.email}
+                  </div>
+                ) : null}
                 <FieldArray
                   name="data_fields"
                   render={(arrayHelpers) => (

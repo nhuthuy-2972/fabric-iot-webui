@@ -41,7 +41,7 @@ const StreamDevices = ({ bcidentity }: any) => {
   const refreshAuthLogic = (failedRequest: any) =>
     axios({
       method: 'post',
-      url: 'http://localhost:4002/api/user/gettoken',
+      url: process.env.REACT_APP_API_EXPRESS + '/api/user/gettoken',
       headers: {
         Authorization: 'Bearer ' + state.customClaims.token,
       },
@@ -70,7 +70,7 @@ const StreamDevices = ({ bcidentity }: any) => {
   React.useEffect(() => {
     console.log('set fields')
     const getdata = async () => {
-      let docs = db.collection('device').doc(id)
+      let docs = db.collection('devices').doc(id)
 
       await docs
         .get()
@@ -104,7 +104,7 @@ const StreamDevices = ({ bcidentity }: any) => {
             Authorization:
               'Bearer ' + sessionStorage.getItem(state.user.uid + id),
           },
-          url: 'http://localhost:4002/api/device/datadevice',
+          url: process.env.REACT_APP_API_EXPRESS + '/api/device/datadevice',
         })
           .then((res: any) => {
             console.log(res.data)

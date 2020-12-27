@@ -78,6 +78,15 @@ const Row = ({ striped, row, dataf }: any) => {
   const { id }: any = useParams()
   const router = useHistory()
 
+  const checkemty = (s: any) => {
+    for (const i of s) {
+      if (i.share === true) {
+        console.log('share', i)
+        return true
+      }
+    }
+    return false
+  }
   React.useEffect(() => {
     const getattrs = async () => {
       try {
@@ -86,7 +95,7 @@ const Row = ({ striped, row, dataf }: any) => {
           headers: {
             Authorization: 'Bearer ' + state.customClaims.token,
           },
-          url: 'http://192.168.0.100:4002/api/user/getuserfield',
+          url: process.env.REACT_APP_API_EXPRESS + '/api/user/getuserfield',
           data: {
             deviceID: id,
             auth: row.uid,
@@ -95,7 +104,7 @@ const Row = ({ striped, row, dataf }: any) => {
 
         console.log(result.data)
         setdatafieldchoosen(result.data.data)
-        setdatafieldchoosen1(result.data.data)
+        // setdatafieldchoosen1(result.data.data)
       } catch (error) {
         toaster.warning(
           <div className={css({ ...theme.typography.font200 })}>
@@ -191,7 +200,6 @@ const Row = ({ striped, row, dataf }: any) => {
             }}
             onClick={(e) => {
               // router.push(`/devices/display/${row.deviceID}`)
-              console.log('sssss')
               e.preventDefault()
               const revoke = async () => {
                 try {
@@ -200,7 +208,9 @@ const Row = ({ striped, row, dataf }: any) => {
                     headers: {
                       Authorization: 'Bearer ' + state.customClaims.token,
                     },
-                    url: 'http://192.168.0.100:4002/api/user/revokeuser',
+                    url:
+                      process.env.REACT_APP_API_EXPRESS +
+                      '/api/user/revokeuser',
                     data: {
                       deviceID: id,
                       auth: row.uid,
@@ -251,7 +261,7 @@ const Row = ({ striped, row, dataf }: any) => {
           </Button>
           <span className={space} />
           <Button
-            // disabled={row.actived !== 'yes' ? true : false}
+            // disabled={row.actived !== true ? true : false}
             size="compact"
             kind="tertiary"
             onClick={() => {
@@ -312,7 +322,6 @@ const Row = ({ striped, row, dataf }: any) => {
           initialValues={{
             deviceID: id,
             email: row.email,
-            // data_fields_checked : datafieldchoosen.data_fields as any,
             data_fields: [
               // ...datafieldchoosen.data_fields
               ...datafieldchoosen,
@@ -338,6 +347,27 @@ const Row = ({ striped, row, dataf }: any) => {
             // console.log("value",values)
             let data: any = values
             try {
+              if (!checkemty(values.data_fields)) {
+                actions.setSubmitting(false)
+                toaster.negative(
+                  <div className={css({ ...theme.typography.font200 })}>
+                    Phải có ít nhất 1 sensor được chia sẽ họăc xóa người dùng
+                    nếu bạn không muốn chia sẽ tiếp tục.
+                  </div>,
+                  {
+                    autoHideDuration: 3000,
+                    overrides: {
+                      Body: {
+                        style: {
+                          borderTopLeftRadius: theme.sizing.scale400,
+                          borderBottomRightRadius: theme.sizing.scale400,
+                        },
+                      },
+                    },
+                  },
+                )
+                return
+              }
               console.log(data)
               for (const i in data.data_fields) {
                 // console.log(data.data_fields[i])
@@ -348,7 +378,9 @@ const Row = ({ striped, row, dataf }: any) => {
 
               const result = await axios({
                 method: 'post',
-                url: 'http://192.168.0.100:4002/api/user/updatefieldshare',
+                url:
+                  process.env.REACT_APP_API_EXPRESS +
+                  '/api/user/updatefieldshare',
                 headers: {
                   Authorization: 'Bearer ' + state.customClaims.token,
                 },
@@ -572,16 +604,15 @@ const Row = ({ striped, row, dataf }: any) => {
                                     console.log(e.target.checked)
                                     const checked = e.target.checked
                                     if (checked) {
-                                      // values.data_fields_checked[i].share = true
-                                      data_field.share = true
+                                      values.data_fields[i].share = true
+                                      // data_field.share = true
                                     } else {
-                                      // values.data_fields_checked[i].share = false
-                                      data_field.share = false
+                                      values.data_fields[i].share = false
+                                      // data_field.share = false
                                     }
-                                    // console.log("choosen1" ,datafieldchoosen1.data_fields)
-                                    // console.log("chooesen",datafieldchoosen.data_fields)
+                                    // console.log('choosen1', datafieldchoosen1)
+                                    console.log('chooesen', datafieldchoosen)
                                     console.log('Data', values.data_fields)
-                                    // console.log("checked",values.data_fields_checked)
                                   }}
                                 />
                               </Block>
@@ -595,10 +626,47 @@ const Row = ({ striped, row, dataf }: any) => {
               <ModalFooter>
                 <ModalButton
                   type="button"
-                  onClick={() => {
-                    datafieldchoosen1.map((dtf, i) => {
-                      values.data_fields[i].share = dtf.share
-                    })
+                  onClick={async () => {
+                    try {
+                      const result = await axios({
+                        method: 'post',
+                        headers: {
+                          Authorization: 'Bearer ' + state.customClaims.token,
+                        },
+                        url:
+                          process.env.REACT_APP_API_EXPRESS +
+                          '/api/user/getuserfield',
+                        data: {
+                          deviceID: id,
+                          auth: row.uid,
+                        },
+                      })
+
+                      console.log(result.data)
+                      setdatafieldchoosen(result.data.data)
+                      // setdatafieldchoosen1(result.data.data)
+                    } catch (error) {
+                      toaster.warning(
+                        <div className={css({ ...theme.typography.font200 })}>
+                          Đã có lỗi xãy ra!!
+                        </div>,
+                        {
+                          autoHideDuration: 3000,
+                          overrides: {
+                            Body: {
+                              style: {
+                                borderTopLeftRadius: theme.sizing.scale400,
+                                borderBottomRightRadius: theme.sizing.scale400,
+                              },
+                            },
+                          },
+                        },
+                      )
+                      router.replace('/')
+                    }
+                    // datafieldchoosen1.map((dtf, i) => {
+                    //   values.data_fields[i].share = dtf.share
+                    // })
                     // values.data_fields_checked = datafieldchoosen.data_fields
                     // setdatafieldchoosen(datafieldchoosen)
                     // values.data_fields=datafieldchoosen.data_fields

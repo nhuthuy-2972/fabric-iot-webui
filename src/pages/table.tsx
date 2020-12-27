@@ -96,7 +96,7 @@ const Row = ({ striped, row, type }: any) => {
             whiteSpace: 'nowrap',
           })}
         >
-          {row.actived === 'yes' ? (
+          {row.actived === true ? (
             <Tag closeable={false} variant="outlined" kind={'positive'}>
               {'Actived yet'}
             </Tag>
@@ -120,7 +120,7 @@ const Row = ({ striped, row, type }: any) => {
           })}
         >
           <Button
-            disabled={row.actived !== 'yes' ? true : false}
+            disabled={row.actived !== true ? true : false}
             size="compact"
             kind="secondary"
             startEnhancer={() => (
@@ -153,7 +153,7 @@ const Row = ({ striped, row, type }: any) => {
             <>
               <span className={space} />
               <Button
-                disabled={row.actived !== 'yes' ? true : false}
+                disabled={row.actived !== true ? true : false}
                 size="compact"
                 kind="secondary"
                 onClick={() => {

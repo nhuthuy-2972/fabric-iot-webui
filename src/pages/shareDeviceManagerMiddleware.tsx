@@ -14,7 +14,7 @@ const ManagerMidleWare = () => {
 
   React.useEffect(() => {
     const getdata = async () => {
-      let docs = db.collection('device').doc(id)
+      let docs = db.collection('devices').doc(id)
       docs
         .get()
         .then((doc: any) => {

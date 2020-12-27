@@ -20,10 +20,10 @@ import {
   MDBIcon,
   MDBCardTitle,
   MDBBtn,
+  MDBNavLink,
 } from 'mdbreact'
 import { Typography } from '@material-ui/core'
 import { Link } from 'react-scroll'
-
 
 export const LoginForm: React.FC<{}> = () => {
   // let [isWideEnough, setIsWideEnough] = React.useState(false)
@@ -32,7 +32,6 @@ export const LoginForm: React.FC<{}> = () => {
     setCollapse(!collapse)
   }
   return (
-
     // <MDBBtn
     //   onClick={() => {
     //     fbase
@@ -93,9 +92,8 @@ export const LoginForm: React.FC<{}> = () => {
                     offset={0}
                     duration={500}
                   >
-                    <h5>Home</h5>
+                    <MDBNavLink to="#">Home</MDBNavLink>
                   </Link>
-
                 </MDBNavItem>
                 <MDBNavItem>
                   <Link
@@ -106,8 +104,7 @@ export const LoginForm: React.FC<{}> = () => {
                     offset={0}
                     duration={500}
                   >
-                    About Us {/* <MDBNavLink to="#">About Us</MDBNavLink> */}
-
+                    <MDBNavLink to="#">About Us</MDBNavLink>
                   </Link>
                 </MDBNavItem>
                 <Link
@@ -119,9 +116,8 @@ export const LoginForm: React.FC<{}> = () => {
                   duration={500}
                 >
                   <MDBNavItem>
-                    Our Services
-
-                    {/* <MDBNavLink to="#">Our Services</MDBNavLink> */}
+                    {/* Our Services */}
+                    <MDBNavLink to="#">Our Services</MDBNavLink>
                   </MDBNavItem>
                 </Link>
                 <Link
@@ -133,8 +129,8 @@ export const LoginForm: React.FC<{}> = () => {
                   duration={500}
                 >
                   <MDBNavItem>
-                    Bắt đầu sử dụng
-                    {/* <MDBNavLink to="#">Bắt đầu sử dụng</MDBNavLink> */}
+                    {/* Bắt đầu sử dụng */}
+                    <MDBNavLink to="#">Bắt đầu sử dụng</MDBNavLink>
                   </MDBNavItem>
                 </Link>
               </MDBNavbarNav>
@@ -186,7 +182,10 @@ export const LoginForm: React.FC<{}> = () => {
                       </Typography>
                     </MDBCol>
                     <MDBCol size="6">
-                      <img src={process.env.PUBLIC_URL + '/images/services.png'} alt="#"/>
+                      <img
+                        src={process.env.PUBLIC_URL + '/images/services.png'}
+                        alt="#"
+                      />
                     </MDBCol>
                   </MDBRow>
                 </MDBContainer>

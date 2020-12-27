@@ -31,14 +31,14 @@ const DevicesPage = () => {
   React.useEffect(() => {
     const getdata = async () => {
       await db
-        .collection('device')
+        .collection('devices')
         .doc(id)
         .get()
         .then((doc: any) => {
           if (
             doc.exists &&
             doc.data().auth === state.user.uid &&
-            doc.data().actived === 'yes'
+            doc.data().actived === true
           ) {
             console.log('yes!')
             let docs = db
@@ -70,7 +70,9 @@ const DevicesPage = () => {
                       headers: {
                         Authorization: 'Bearer ' + state.customClaims.token,
                       },
-                      url: 'http://localhost:4002/api/user/gettoken',
+                      url:
+                        process.env.REACT_APP_API_EXPRESS +
+                        '/api/user/gettoken',
                       data: {
                         bcIdentity: info.bcIdentity,
                         deviceID: id,

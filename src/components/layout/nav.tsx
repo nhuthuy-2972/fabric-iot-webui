@@ -132,7 +132,9 @@ export const Nav: React.FC<{}> = () => {
 
                 const result = await axios({
                   method: 'post',
-                  url: 'http://192.168.0.100:4002/api/user/updatephonenumber',
+                  url:
+                    process.env.REACT_APP_API_EXPRESS +
+                    '/api/user/updatephonenumber',
                   headers: {
                     Authorization: 'Bearer ' + state.customClaims.token,
                   },

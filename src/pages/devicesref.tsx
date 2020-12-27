@@ -23,7 +23,7 @@ const DevicesPageRef = () => {
   React.useEffect(() => {
     const getdata = async () => {
       await db
-        .collection('device')
+        .collection('devices')
         .doc(id)
         .get()
         .then((doc: any) => {
@@ -55,7 +55,8 @@ const DevicesPageRef = () => {
                   })
                   const result = await axios({
                     method: 'post',
-                    url: 'http://localhost:4002/api/user/gettoken',
+                    url:
+                      process.env.REACT_APP_API_EXPRESS + '/api/user/gettoken',
                     headers: {
                       Authorization: 'Bearer ' + state.customClaims.token,
                     },
