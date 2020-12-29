@@ -3,6 +3,8 @@ import { DeepstreamClient } from '@deepstream/client'
 import { useStyletron } from 'baseui'
 import { Button } from 'baseui/button'
 // import moment from 'moment'
+import { Tag } from 'baseui/tag'
+
 import axios from 'axios'
 import { useParams, useLocation, useHistory } from 'react-router-dom'
 import { db, useAuth } from '../../hooks/use-auth'
@@ -16,9 +18,18 @@ import {
   ModalButton,
   FocusOnce,
 } from 'baseui/modal'
+import { FlexGrid, FlexGridItem } from 'baseui/flex-grid'
+import { BlockProps } from 'baseui/block'
 // import { Input, SIZE } from 'baseui/input'
 import createAuthRefreshInterceptor from 'axios-auth-refresh'
 
+const itemProps: BlockProps = {
+  backgroundColor: 'mono300',
+  height: 'scale1000',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+}
 // moment().zone(7)
 
 const StreamDevices = ({ bcidentity }: any) => {
@@ -34,6 +45,7 @@ const StreamDevices = ({ bcidentity }: any) => {
   const [device, setdevice] = React.useState(Object)
   const [isOpen, setOpen] = React.useState(false)
   const { state }: any = useAuth()
+  const [lastUpdate, setLastUpdate] = React.useState('')
   const space = css({ marginRight: theme.sizing.scale500 })
 
   console.log('aasfasfsaf', bcidentity)
@@ -78,7 +90,8 @@ const StreamDevices = ({ bcidentity }: any) => {
           if (doc.exists && doc.data().auth === state.user.uid) {
             let field = doc.get('data_fields')
             setfields(field)
-            setdevice({ name: doc.get('name'), desc: doc.get('desc') })
+            // setdevice({ name: doc.get('name'), desc: doc.get('desc') })
+            setdevice(doc.data())
           } else {
             console.log('No such document!')
           }
@@ -108,14 +121,15 @@ const StreamDevices = ({ bcidentity }: any) => {
         })
           .then((res: any) => {
             console.log(res.data)
-            const data = res.data.map((item: any) => {
+            const temp = res.data.slice(0, 25)
+            const data = temp.map((item: any) => {
               return {
                 ...item.data,
                 time: new Date(item.data.timestamp * 1000).toLocaleString(),
               }
             })
             console.log(data)
-
+            setLastUpdate(data[0].time)
             setData({ data: value, history: data.reverse() })
             // sethistory(data.reverse())
           })
@@ -130,7 +144,7 @@ const StreamDevices = ({ bcidentity }: any) => {
       record.unsubscribe(`news/${id}`, () => console.log('offline'))
     }
   }, [])
-
+  console.log(new Date().getTime() - new Date(lastUpdate).getTime())
   console.log('info ne', bcidentity)
   //console.log("fields", fields)
   console.log('name', device)
@@ -144,9 +158,13 @@ const StreamDevices = ({ bcidentity }: any) => {
           alignItems: 'center',
         })}
       >
-        <div className={css({ ...theme.typography.font550 })}>
-          {`${device.name || 'X iot'} (${id})`}
-          {/* Batery :{' '} */}
+        <div
+          className={css({
+            ...theme.typography.font650,
+          })}
+        >
+          {`${device.name || 'X iot'}`}
+          {/* Batery :{' '}
           {data.history.slice(-1).pop() ? (
             <>
               {' '}
@@ -155,7 +173,7 @@ const StreamDevices = ({ bcidentity }: any) => {
             </>
           ) : (
             ''
-          )}
+          )} */}
         </div>
 
         <Button
@@ -176,6 +194,95 @@ const StreamDevices = ({ bcidentity }: any) => {
           Thống kê
         </Button>
       </div>
+
+      <FlexGrid
+        flexGridColumnCount={3}
+        flexGridColumnGap="scale800"
+        flexGridRowGap="scale800"
+        marginBottom="scale800"
+        marginTop="scale800"
+      >
+        <FlexGridItem
+          {...itemProps}
+          overrides={{
+            Block: {
+              style: ({ $theme }) => ({
+                fontWeight: 'bold',
+              }),
+            },
+          }}
+        >
+          {' '}
+          {`ID thiết bị: ${id}`}
+        </FlexGridItem>
+        <FlexGridItem
+          {...itemProps}
+          overrides={{
+            Block: {
+              style: ({ $theme }) => ({
+                fontWeight: 'bold',
+              }),
+            },
+          }}
+        >{`Số lượng cảm biến: ${fields.length}`}</FlexGridItem>
+        <FlexGridItem
+          {...itemProps}
+          overrides={{
+            Block: {
+              style: ({ $theme }) => ({
+                fontWeight: 'bold',
+              }),
+            },
+          }}
+        >
+          {data.history.slice(-1).pop() ? (
+            <>{`Năng lượng: ${data.history.slice(-1).pop().battery}% `}</>
+          ) : (
+            ''
+          )}
+        </FlexGridItem>
+
+        <FlexGridItem
+          {...itemProps}
+          overrides={{
+            Block: {
+              style: ({ $theme }) => ({
+                fontWeight: 'bold',
+              }),
+            },
+          }}
+        >{`Thời gian đẫy dữ liệu: ${device.push_time}phút/lần`}</FlexGridItem>
+
+        <FlexGridItem display="none">
+          This invisible one is needed so the margins line up
+        </FlexGridItem>
+        <FlexGridItem
+          {...itemProps}
+          overrides={{
+            Block: {
+              style: ({ $theme }) => ({
+                width: `calc((200% - ${$theme.sizing.scale800}) / 3)`,
+                fontWeight: 'bold',
+              }),
+            },
+          }}
+        >
+          <>
+            <div> {`Lần cập nhật cuối cùng : ${lastUpdate}`}</div>
+            {lastUpdate ? (
+              new Date().getTime() - new Date(lastUpdate).getTime() > 900000 ? (
+                <Tag closeable={false} variant="outlined" kind={'warning'}>
+                  Warning
+                </Tag>
+              ) : (
+                ''
+              )
+            ) : (
+              ''
+            )}
+          </>
+        </FlexGridItem>
+      </FlexGrid>
 
       <div
         className={css({

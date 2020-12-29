@@ -22,11 +22,11 @@ const CustomizedAxisTick = ({ x, y, stroke, payload }: any) => {
         x={0}
         y={0}
         dx={20}
-        dy={16}
-        textAnchor="end"
+        dy={30}
+        textAnchor="middle"
         fill="#000000"
         fontWeight="bold"
-        fontSize={10}
+        fontSize={9}
         transform="rotate(-20)"
       >
         {payload.value}

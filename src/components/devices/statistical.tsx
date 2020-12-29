@@ -143,9 +143,7 @@ export const Statistical = ({ bcidentity }: any) => {
                 const data = res.data.map((item: any) => {
                   return {
                     ...item.data,
-                    time: new Date(
-                      item.data.timestamp * 1000,
-                    ).toLocaleTimeString(),
+                    time: new Date(item.data.timestamp * 1000).toLocaleString(),
                   }
                 })
                 console.log(data)

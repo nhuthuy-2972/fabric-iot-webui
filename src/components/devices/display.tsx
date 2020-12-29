@@ -125,8 +125,7 @@ const Display = ({ field, data, history }: any) => {
           </div>
           <div>
             <div className={css({ ...theme.typography.font400 })}>
-              {field.field_display} (Trong khoảng 24 giờ kể từ lần cập nhật cuối
-              cùng)
+              {field.field_display}
             </div>
           </div>
         </div>
@@ -150,7 +149,14 @@ const Display = ({ field, data, history }: any) => {
               <CartesianGrid vertical={false} />
               <XAxis
                 dataKey="time"
-                tickFormatter={(value) => value}
+                tickFormatter={(value) => {
+                  // console.log(value.split(', '))
+                  // const temp = value.split(', ')
+                  // console.log(`${temp[0]}\n${temp[1]}`)
+
+                  // return `${temp[0]}\n${temp[1]}`
+                  return value
+                }}
                 tick={<CustomizedAxisTick />}
               />
               <YAxis axisLine={false} tickFormatter={(value) => value} />
@@ -162,8 +168,9 @@ const Display = ({ field, data, history }: any) => {
                 animationDuration={2000}
                 type="linear"
                 dataKey={field.field_name}
-                stroke="#ec157a"
-                fill="#ec157a"
+                strokeWidth="2px"
+                stroke="#757575"
+                fill="#21A453"
               />
             </LineChart>
           </ResponsiveContainer>

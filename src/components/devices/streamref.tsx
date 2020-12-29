@@ -112,12 +112,11 @@ const StreamDevicesRef = ({ bcidentity, deviceinfo }: any) => {
           })
             .then((res: any) => {
               console.log(res.data)
-              const data = res.data.map((item: any) => {
+              const temp = res.data.slice(0, 25)
+              const data = temp.map((item: any) => {
                 return {
                   ...item.data,
-                  time: new Date(
-                    item.data.timestamp * 1000,
-                  ).toLocaleTimeString(),
+                  time: new Date(item.data.timestamp * 1000).toLocaleString(),
                 }
               })
               console.log(data)
@@ -151,10 +150,11 @@ const StreamDevicesRef = ({ bcidentity, deviceinfo }: any) => {
         })
           .then((res: any) => {
             console.log(res.data)
-            const data = res.data.map((item: any) => {
+            const temp = res.data.slice(0, 25)
+            const data = temp.map((item: any) => {
               return {
                 ...item.data,
-                time: new Date(item.data.timestamp * 1000).toLocaleTimeString(),
+                time: new Date(item.data.timestamp * 1000).toLocaleString(),
               }
             })
             console.log(data)

@@ -39,8 +39,8 @@ import { Checkbox, LABEL_PLACEMENT } from 'baseui/checkbox'
 import { StyledTable, StyledHeadCell, StyledBodyCell } from 'baseui/table-grid'
 import { OptionList } from 'baseui/menu'
 import { CssBaseline } from '@material-ui/core'
-const Yup = require('yup')
-require('yup-phone')
+// const Yup = require('yup')
+// require('yup-phone')
 
 const ErrorMessage = ({ name }: any) => {
   const [css, theme] = useStyletron()
@@ -78,11 +78,11 @@ const IndexPage = () => {
   const [warning, setWarning] = React.useState(false)
   const [value, setValue] = React.useState<Value>([])
 
-  const vali = Yup.object().shape({
-    phone_number: Yup.string()
-      .phone('VN', true, 'Phone number invalid')
-      .required('required'),
-  })
+  // const vali = Yup.object().shape({
+  //   phone_number: Yup.string()
+  //     .phone('VN', true, 'Phone number invalid')
+  //     .required('required'),
+  // })
 
   // const testfun = async () => {
   //   // db.collection('devices')
@@ -678,6 +678,7 @@ const IndexPage = () => {
       >
         <Formik
           initialValues={{
+            push_time: '',
             name: '',
             desc: '',
             warning: false,
@@ -919,7 +920,23 @@ const IndexPage = () => {
                     }}
                   />
                 </FormControl>
-
+                <FormControl label="Chu kì đẫỹ dữ liệu *">
+                  <Input
+                    required
+                    name="push_time"
+                    type="number"
+                    onChange={handleChange}
+                    value={values.push_time}
+                    overrides={{
+                      InputContainer: {
+                        style: {
+                          borderTopLeftRadius: theme.sizing.scale400,
+                          borderBottomRightRadius: theme.sizing.scale400,
+                        },
+                      },
+                    }}
+                  />
+                </FormControl>
                 <FieldArray
                   name="data_fields"
                   render={(arrayHelpers) => (
